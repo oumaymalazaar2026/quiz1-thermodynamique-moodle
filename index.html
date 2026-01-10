@@ -54,6 +54,9 @@
                     <button onclick="startMission()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 px-12 rounded-2xl shadow-lg transition-all hover:scale-105">
                         Démarrer la Mission
                     </button>
+                    <input id="studentName" 
+       placeholder="Entrez votre nom" 
+       class="border p-3 rounded-xl mb-4 w-full text-center font-bold" />
                 </div>
             </div>
         </section>
@@ -169,7 +172,9 @@
             clearInterval(timer);
             const data = database[currentIdx];
             const isCorrect = selectedText === data.correctText;
-            
+
+            const studentName = document.getElementById("studentName").value || "Anonyme";
+saveAnswer(studentName, data.q, selectedText, isCorrect);
             // Écran de feedback intermédiaire (Style Pédagogie Positive)
             let feedbackHtml = `
                 <div class="card-pop text-center py-6">
@@ -259,6 +264,19 @@
             html += `</div><button onclick="renderEndScreen()" class="mt-6 w-full py-4 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 transition">Fermer le rapport</button></div>`;
             document.getElementById('quiz-box').innerHTML = html;
         }
+        Dans ton <script>, ajoute :
+
+function saveAnswer(nom, question, reponse, correct) {
+  fetch("https://script.google.com/macros/s/AKfycbxNodIwPH_0NLz_dModyVYDjOCXeddBHSo4ziFljKhv2d09uRi9FTdC9sCppVIkLtBXNQ/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      nom: nom,
+      question: question,
+      reponse: reponse,
+      correct: correct
+    })
+  });
+}
     </script>
 </body>
 </html>
