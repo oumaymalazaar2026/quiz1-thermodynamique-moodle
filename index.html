@@ -1,273 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thermo : Le Collectionneur</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes shine { 0% { background-position: -200% } 100% { background-position: 200% } }
-        .rarity-legendary { 
-            background: linear-gradient(90deg, #ffd700, #fff5b1, #ffd700);
-            background-size: 200% auto;
-            animation: shine 3s linear infinite;
-            border: 2px solid #b8860b;
-        }
-        .rarity-rare { border: 2px solid #805ad5; background-color: #faf5ff; }
-        .rarity-common { border: 2px solid #e2e8f0; background-color: #ffffff; }
-        .card-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .badge-glow { filter: drop-shadow(0 0 20px rgba(234, 179, 8, 0.9)); animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        #timer-bar { transition: width 1s linear; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thermo : Le Code du Coffre (8 Niveaux)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    body { background-color: #f5f2e9; font-family: sans-serif; }
+    .vault-wheel { background: linear-gradient(#3e2723, #5d4037, #3e2723); border: 2px solid #d4a373; color: white; font-weight: bold; border-radius: 0.5rem; text-shadow: 0 0 10px rgba(250,237,205,0.5);}
+    .shake { animation: shake 0.2s ease-in-out 0s 2; }
+    @keyframes shake { 0%,100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+    .card-pop { animation: pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
+    @keyframes pop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .rarity-gold { border: 2px solid #b8860b; background: linear-gradient(135deg, #ffd700, #faf5b1); box-shadow: 0 4px 10px rgba(184,134,11,0.3);}
+</style>
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col font-sans text-slate-900">
+<body class="bg-antique min-h-screen text-stone-900">
 
-<header class="bg-indigo-950 text-white p-6 shadow-2xl flex justify-between items-center border-b-4 border-yellow-500">
+<header class="bg-[#3e2723] text-[#faedcd] p-4 shadow-xl border-b-4 border-[#bc6c25] flex justify-between items-center">
     <div>
-        <h1 class="text-2xl font-black uppercase tracking-tight">Mission : Le Collectionneur</h1>
-        <p class="text-indigo-300 text-sm italic">Outils mathématiques et notions fondamentales de la thermodynamique</p>
+        <h1 class="font-black uppercase tracking-tighter text-xl">Mission : Le Coffre-Fort</h1>
+        <p class="text-[10px] text-[#d4a373] uppercase tracking-widest font-bold">TD1 : Outils Mathématiques</p>
     </div>
-    <div class="text-right">
-        <span class="text-xl font-bold block leading-none">LAZAAR Oumayma</span>
-        <span class="text-[10px] bg-indigo-700 px-2 py-1 rounded text-white mt-2 inline-block uppercase font-bold tracking-widest">Architecte Pédagogique</span>
+    <div class="text-right border-l border-[#d4a373] pl-4">
+        <input id="studentName" type="text" placeholder="Votre nom" class="px-2 py-1 rounded text-[#3e2723] font-bold" />
     </div>
 </header>
 
-<main class="flex-grow p-4 md:p-8 max-w-5xl mx-auto w-full">
+<main class="p-6 max-w-2xl mx-auto">
 
-    <div class="flex justify-between items-center mb-2 px-2">
-        <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Maîtrise des concepts</span>
-        <span class="text-sm font-black text-indigo-900 uppercase">Points : <span id="live-score" class="text-2xl text-indigo-600">0</span>/8</span>
+    <div class="flex justify-between text-[10px] font-bold uppercase mb-1 text-stone-500">
+        <span>Déchiffrement en cours</span>
+        <span id="score-text">Niveau 0/8</span>
     </div>
-    <div class="mb-8 bg-slate-200 rounded-full h-3 overflow-hidden p-0.5">
-        <div id="progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-500 w-0"></div>
+    <div class="h-3 bg-stone-300 rounded-full mb-8 overflow-hidden p-0.5 border border-stone-200">
+        <div id="prog-bar" class="h-full bg-[#8b4513] w-0 transition-all duration-700 rounded-full"></div>
     </div>
 
-    <section id="game-container" class="bg-white rounded-3xl shadow-xl p-6 md:p-10 mb-10 border border-slate-200 min-h-[480px] flex items-center justify-center">
-        <div id="quiz-box" class="w-full">
-            <div class="text-center py-10">
-                <span class="text-7xl mb-6 block">🔐</span>
-                <h2 class="text-3xl font-black text-slate-800 mb-4">8 Verrous à Ouvrir</h2>
-                <p class="text-slate-500 mb-8 max-w-md mx-auto italic text-lg">
-                    Calculez les dérivées et coefficients du TD1 pour vider le coffre.
-                </p>
-
-                <!-- Champ pour le nom de l'étudiant -->
-                <input id="studentName" 
-                       type="text" 
-                       placeholder="Entrez votre nom" 
-                       class="mb-2 px-4 py-3 rounded-xl border border-slate-300 w-80 text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-
-                <!-- Message d'erreur si nom vide -->
-                <p id="nameError" class="text-red-600 text-sm hidden mb-4">
-                    Veuillez entrer votre nom pour commencer le quiz.
-                </p>
-
-                <button onclick="startMission()" 
-                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 px-12 rounded-2xl shadow-lg transition-all hover:scale-105">
-                    Lancer la Mission
-                </button>
-            </div>
+    <section id="game-zone" class="bg-white rounded-3xl shadow-2xl p-8 border-2 border-stone-200 relative overflow-hidden">
+        <div id="quiz-content" class="text-center py-12">
+            <div class="text-7xl mb-6">🔐</div>
+            <h2 class="text-3xl font-black text-[#3e2723] mb-4 uppercase tracking-tighter">8 Verrous à Ouvrir</h2>
+            <p class="text-stone-500 italic mb-10 max-w-xs mx-auto">Calculez les dérivées et coefficients du TD1 pour vider le coffre.</p>
+            <button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] px-12 py-4 rounded-xl font-bold hover:bg-black transition-all shadow-xl active:scale-95">Lancer l'Analyse</button>
         </div>
     </section>
 
-    <section>
-        <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-            <h3 class="text-2xl font-black text-indigo-950 uppercase flex items-center gap-3">
-                📜 Grimoire des Concepts <span id="badge-count" class="bg-indigo-950 text-white text-sm px-3 py-1 rounded-full">0</span>
-            </h3>
+    <div class="mt-12">
+        <h3 class="text-xs font-black text-[#3e2723] uppercase mb-4 tracking-widest border-b border-stone-300 pb-2">📜 Grimoire des Concepts (Badges)</h3>
+        <div id="inventory" class="flex flex-wrap gap-3 justify-start min-h-[60px]">
+            <p id="empty-inv" class="text-xs italic text-stone-400">Réussissez un calcul pour gagner un badge...</p>
         </div>
-        <div id="inventory-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-slate-200/50 rounded-3xl border-2 border-dashed border-slate-300 min-h-[150px]">
-            <p class="col-span-full text-center text-slate-400 py-6 italic text-sm">Votre inventaire est prêt à recevoir vos succès.</p>
-        </div>
-    </section>
+    </div>
 </main>
 
 <script>
-const originalDatabase = [
-    { q: "Ex 1.a : ∂f/∂x pour f(x,y)=2x²+y³ au point (x=1, y=2).", options: ["4", "3", "2"], correctText: "4", concept: "Dérivée Partielle", exp: "∂f/∂x = 4x. Pour x=1, le résultat est 4." },
-    { q: "Ex 1.c : ∂f/∂y pour f(x,y)=x²/y + y²/x au point (1,1).", options: ["1", "2", "0"], correctText: "1", concept: "Fonction Inverse", exp: "∂f/∂y = -x²/y² + 2y/x. En (1,1) : -1 + 2 = 1." },
-    { q: "Ex 2.b : Si f=x³y, calculez df pour x=1, y=1, dx=1 et dy=0.", options: ["3", "1", "0"], correctText: "3", concept: "Différentielle", exp: "df = (3x²y)dx + (x³)dy. Ici : 3*1*1 + 0 = 3." },
-    { q: "Ex 3.2 : Pour df=2xydx + x²dy, que vaut ∂²f/∂y∂x ?", options: ["2", "1", "0"], correctText: "2", concept: "Schwartz", exp: "On dérive 2xy par rapport à y. En x=1, le résultat est 2." },
-    { q: "Ex 9.f : Valeur de α.T pour un gaz parfait ?", options: ["1", "0", "-1"], correctText: "1", concept: "Gaz Parfait", exp: "α = 1/T. Donc α*T = 1." },
-    { q: "Ex 2.a : ∂f/∂x pour f=x.sin(y) au point (x=5, y=0).", options: ["0", "5", "1"], correctText: "0", concept: "Trigonométrie", exp: "∂f/∂x = sin(y). sin(0) = 0." },
-    { q: "Ex 9.d : Unité de α = (1/V)(∂V/∂T)p ?", options: ["K", "K⁻¹", "Pa⁻¹"], correctText: "K⁻¹", concept: "Unités SI", exp: "Le coefficient de dilatation α est en K⁻¹." },
-    { q: "Ex 9.c : Valeur de (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p ?", options: ["-1", "0", "1"], correctText: "-1", concept: "Relation Triple", exp: "C'est la relation cyclique fondamentale, elle vaut toujours -1." }
+const questions = [
+    {id:1, concept:"Dérivée Partielle", q:"Ex 1.a : ∂f/∂x pour f(x,y)=2x²+y³ au point (1,2).", answer:"4", hint:"∂f/∂x = 4x → x=1 ⇒ 4"},
+    {id:2, concept:"Fonction Inverse", q:"Ex 1.c : ∂f/∂y pour f(x,y)=x²/y + y²/x au point (1,1).", answer:"1", hint:"∂f/∂y = -x²/y² + 2y/x → 1"},
+    {id:3, concept:"Différentielle", q:"Ex 2.b : Si f=x³y, calculez df pour x=1,y=1,dx=1,dy=0.", answer:"3", hint:"df = (3x²y)dx + x³dy =3"},
+    {id:4, concept:"Schwartz", q:"Ex 3.2 : df=2xydx + x²dy, ∂²f/∂y∂x ?", answer:"2", hint:"Dériver 2xy par y → 2x"},
+    {id:5, concept:"Gaz Parfait", q:"Ex 9.f : Valeur de α.T ?", answer:"1", hint:"α = 1/T → α*T =1"},
+    {id:6, concept:"Trigonométrie", q:"Ex 2.a : ∂f/∂x pour f=x*sin(y) au point (5,0).", answer:"0", hint:"sin(0)=0"},
+    {id:7, concept:"Unités SI", q:"Ex 9.d : Unité α = (1/V)(∂V/∂T)p ? (0:K,1:K⁻¹,2:Pa⁻¹)", answer:"1", hint:"α en K⁻¹"},
+    {id:8, concept:"Relation Triple", q:"Ex 9.c : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p ?", answer:"-1", hint:"Relation cyclique = -1"}
 ];
 
-let database = [];
-let currentIdx = 0;
-let score = 0;
-let inventory = [];
-let userChoices = [];
-let timer;
-let timeLeft;
-const TIME_LIMIT = 15;
+let currentIdx=0, score=0, hasRetried=false, userLog=[], attemptNumber=1;
 
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+function startMission(){
+    const nameInput = document.getElementById("studentName").value.trim();
+    if(!nameInput){ alert("Veuillez entrer votre nom"); return; }
+    window.currentStudentName = nameInput;
+    currentIdx=0; score=0; hasRetried=false; attemptNumber=1; userLog=[]; document.getElementById('inventory').innerHTML=""; renderQuestion();
 }
 
-function startMission() {
-    const studentNameInput = document.getElementById("studentName");
-    const studentName = studentNameInput.value.trim();
-
-    if (!studentName) {
-        document.getElementById("nameError").classList.remove("hidden");
-        studentNameInput.focus();
-        return;
-    } else {
-        document.getElementById("nameError").classList.add("hidden");
-    }
-
-    window.currentStudentName = studentName;
-
-    database = shuffleArray([...originalDatabase]);
-    database.forEach(q => q.options = shuffleArray([...q.options]));
-    currentIdx = 0;
-    score = 0;
-    inventory = [];
-    userChoices = [];
-    updateStats();
-    renderInventory();
-    showQuestion();
-}
-
-function updateStats() {
-    document.getElementById('live-score').innerText = score;
-    document.getElementById('progress-bar').style.width = `${(currentIdx / database.length) * 100}%`;
-    document.getElementById('badge-count').innerText = inventory.length;
-}
-
-function showQuestion() {
-    if (currentIdx >= database.length) {
-        clearInterval(timer);
-        renderEndScreen();
-        return;
-    }
-
-    updateStats();
-    const data = database[currentIdx];
-
-    let html = `
-        <div class="card-pop w-full">
-            <span class="text-indigo-600 font-black uppercase text-[10px] tracking-[0.2em]">Verrou ${currentIdx + 1} sur ${database.length}</span>
-            <h2 class="text-2xl font-bold mt-4 mb-8 text-slate-800 leading-tight">${data.q}</h2>
-            <div class="grid gap-4">
-    `;
-    data.options.forEach((opt) => {
-        html += `
-            <button onclick="handleSelection('${opt.replace(/'/g, "\\'")}')" class="text-left p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-600 hover:bg-indigo-50 transition-all font-semibold flex justify-between items-center group active:scale-95">
-                ${opt}
-                <span class="opacity-0 group-hover:opacity-100 transition-all">Choisir ➜</span>
-            </button>`;
-    });
-    html += `</div></div>`;
-    document.getElementById('quiz-box').innerHTML = html;
-}
-
-function handleSelection(selectedText) {
-    const data = database[currentIdx];
-    const studentName = window.currentStudentName || "Anonyme";
-    const isCorrect = selectedText === data.correctText;
-
-    saveAnswer(studentName, data.q, selectedText, isCorrect);
-
-    if (isCorrect) {
-        score++;
-        generateLoot(data.concept);
-        userChoices.push({ selected: selectedText, correct: true });
-        document.getElementById('quiz-box').innerHTML = `
-            <div class="card-pop text-center py-6">
-                <div class="text-6xl mb-6">🔓</div>
-                <h2 class="text-3xl font-black text-green-600 mb-4">Correct !</h2>
-                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">${data.exp}</p>
-                <button onclick="proceedToNext()" class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">Continuer</button>
-            </div>`;
-    } else {
-        userChoices.push({ selected: selectedText, correct: false });
-        document.getElementById('quiz-box').innerHTML = `
-            <div class="card-pop text-center py-6">
-                <div class="text-6xl mb-6">🚨</div>
-                <h2 class="text-3xl font-black text-amber-600 mb-4">Incorrect</h2>
-                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">${data.exp}</p>
-                <button onclick="proceedToNext()" class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">Suivant</button>
-            </div>`;
-    }
-}
-
-function proceedToNext() {
-    currentIdx++;
-    showQuestion();
-}
-
-function generateLoot(conceptName) {
-    const rand = Math.random();
-    let rarity = rand > 0.85 ? "legendary" : (rand > 0.60 ? "rare" : "common");
-    inventory.push({ name: conceptName, rarity: rarity, emoji: "📜" });
-    renderInventory();
-}
-
-function renderInventory() {
-    const grid = document.getElementById('inventory-grid');
-    if (inventory.length === 0) {
-        grid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-6 italic text-sm">Votre inventaire est prêt à recevoir vos succès.</p>`;
-        return;
-    }
-    grid.innerHTML = inventory.map(item => `
-        <div class="card-pop p-3 rounded-2xl shadow-sm text-center border bg-white rarity-${item.rarity} transition-transform hover:scale-110">
-            <span class="text-2xl block mb-1">${item.emoji}</span>
-            <span class="text-[9px] font-black uppercase text-indigo-950 block leading-tight">${item.name}</span>
-        </div>
-    `).join('');
-}
-
-function renderEndScreen() {
-    updateStats();
-    let mention = score === database.length ? "GRAND MAÎTRE" : (score >= database.length*0.7 ? "EXPERT" : "APPRENTI");
-    document.getElementById('quiz-box').innerHTML = `
-        <div class="text-center py-4 card-pop">
-            ${score === database.length ? '<div class="badge-glow text-8xl mb-6">🎖️</div>' : '<div class="text-6xl mb-6">🏁</div>'}
-            <h2 class="text-6xl font-black text-indigo-950 mb-2">${score}/${database.length}</h2>
-            <p class="text-xl font-bold text-slate-500 mb-10 tracking-widest uppercase">STATUT : ${mention}</p>
-            <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <button onclick="showDetailedCorrection()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl transition-all">ANALYSER LE RAPPORT</button>
-                <button onclick="location.reload()" class="bg-slate-200 text-slate-700 px-10 py-4 rounded-2xl font-bold hover:bg-slate-300 transition">RECOMMENCER</button>
+function renderQuestion(){
+    const data = questions[currentIdx];
+    document.getElementById('quiz-content').innerHTML = `
+        <div class="text-center card-pop">
+            <p class="text-[10px] font-bold text-stone-400 uppercase mb-2">Verrou ${currentIdx+1}/8</p>
+            <h2 class="text-lg font-mono font-bold text-[#3e2723] mb-8 p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300 min-h-[80px] flex items-center justify-center">${data.q}</h2>
+            <input id="userAnswer" type="text" placeholder="Votre réponse" class="px-3 py-2 rounded border text-[#3e2723] font-bold text-center mb-4"/>
+            <div>
+                <button onclick="checkCode()" class="bg-[#3e2723] text-[#faedcd] py-3 rounded-xl font-black uppercase shadow-lg active:scale-95 w-36">Valider</button>
+                <p id="retry-msg" class="text-[10px] text-orange-700 font-bold h-4 uppercase mt-2"></p>
             </div>
+        </div>
+    `;
+    updateUI();
+}
+
+function checkCode(){
+    const userAns = document.getElementById("userAnswer").value.trim();
+    const data = questions[currentIdx];
+    if(userAns === ""){ alert("Entrez une réponse"); return; }
+
+    const isCorrect = (userAns === data.answer);
+    sendToSheet(data.q, userAns, isCorrect);
+
+    if(isCorrect){
+        score++; addBadge(data.concept);
+        document.getElementById('quiz-content').innerHTML = `
+            <div class="text-center py-10 card-pop">
+                <div class="text-6xl mb-4 animate-bounce">🔓</div>
+                <h2 class="text-2xl font-black text-green-700">Excellent ! Continuez</h2>
+                <button onclick="nextQuestion()" class="mt-8 bg-[#3e2723] text-white px-10 py-3 rounded-lg font-bold">Suivant</button>
+            </div>`;
+    } else {
+        if(!hasRetried){
+            hasRetried=true; attemptNumber=2;
+            document.getElementById("retry-msg").innerText = "⚠️ Code invalide : Dernière tentative !";
+        } else {
+            document.getElementById('quiz-content').innerHTML = `
+                <div class="text-center py-10 card-pop">
+                    <div class="text-6xl mb-4">🚨</div>
+                    <h2 class="text-2xl font-black text-red-700 font-mono">Pensez-y encore !</h2>
+                    <p class="text-stone-500 italic mb-4">${data.hint}</p>
+                    <button onclick="nextQuestion()" class="mt-4 bg-stone-200 px-10 py-3 rounded-lg font-bold">Suivant</button>
+                </div>`;
+            userLog.push({q:data.q, user:userAns, correct:false, solution:data.answer, hint:data.hint, level:currentIdx+1, attempt:attemptNumber});
+        }
+    }
+}
+
+function nextQuestion(){
+    const data = questions[currentIdx];
+    if(!hasRetried) attemptNumber=1;
+    if(hasRetried && !userLog.find(u => u.q===data.q && u.attempt===2)){
+        userLog.push({q:data.q, user:document.getElementById("userAnswer")?.value||"", correct:false, solution:data.answer, hint:data.hint, level:currentIdx+1, attempt:2});
+    }
+    currentIdx++; hasRetried=false; attemptNumber=1;
+    if(currentIdx<questions.length) renderQuestion();
+    else renderEnd();
+}
+
+function addBadge(conceptName){
+    const inv = document.getElementById('inventory'); const empty=document.getElementById('empty-inv'); if(empty) empty.remove();
+    inv.innerHTML+=`<div class="card-pop rarity-gold px-2 py-1 rounded flex flex-col items-center justify-center border shadow-sm min-w-[70px]">
+        <span class="text-[7px] font-black uppercase text-[#3e2723] text-center">${conceptName}</span>
+    </div>`;
+}
+
+function updateUI(){
+    document.getElementById('prog-bar').style.width = (currentIdx/questions.length*100) + "%";
+    document.getElementById('score-text').innerText = `Niveau ${currentIdx}/${questions.length}`;
+}
+
+function renderEnd(){
+    document.getElementById('quiz-content').innerHTML = `
+        <div class="text-center card-pop">
+            <h2 class="text-6xl font-black text-[#3e2723]">${score}/${questions.length}</h2>
+            <p class="font-bold text-[#bc6c25] uppercase text-xs mt-2">Déchiffrement Terminé</p>
+            <div class="mt-6 text-left bg-stone-50 rounded-xl p-4 border max-h-[250px] overflow-y-auto">
+                ${userLog.map((item,i)=>`
+                    <div class="mb-3 pb-2 border-b border-stone-200 last:border-0">
+                        <p class="text-[10px] font-bold">${i+1}. ${item.q}</p>
+                        <p class="text-[9px] ${item.correct?'text-green-600':'text-red-600'}">Réponse : ${item.user} ${item.correct?'✅':'❌ (Sol: '+item.solution+')'}</p>
+                        <p class="text-[8px] italic text-stone-400">Note : ${item.hint}</p>
+                    </div>`).join('')}
+            </div>
+            <button onclick="location.reload()" class="mt-6 bg-[#3e2723] text-white px-10 py-4 rounded-xl font-bold w-full">Recommencer</button>
         </div>`;
 }
 
-function showDetailedCorrection() {
-    let html = `<div class="card-pop text-left max-w-3xl mx-auto"><h2 class="text-2xl font-black text-indigo-950 uppercase mb-6 border-b pb-4 tracking-tighter">Rapport de Maîtrise</h2><div class="space-y-4 max-h-[500px] overflow-y-auto pr-4">`;
-    database.forEach((data, i) => {
-        const uc = userChoices[i];
-        html += `
-            <div class="p-6 rounded-3xl border-2 ${uc.correct ? 'border-green-100 bg-green-50' : 'border-red-100 bg-red-50'}">
-                <p class="font-black text-slate-800">${i+1}. ${data.q}</p>
-                <p class="text-sm mt-2"><strong>Votre choix :</strong> <span class="${uc.correct ? 'text-green-600' : 'text-red-600'}">${uc.selected}</span></p>
-                ${!uc.correct ? `<p class="text-sm text-green-700 font-bold">Réponse correcte : ${data.correctText}</p>` : ''}
-                <div class="mt-4 p-4 bg-white/80 rounded-2xl text-xs text-slate-600 border border-white leading-relaxed italic">
-                    <strong>Note pédagogique :</strong> ${data.exp}
-                </div>
-            </div>`;
-    });
-    html += `</div><button onclick="renderEndScreen()" class="mt-6 w-full py-4 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 transition">Fermer le rapport</button></div>`;
-    document.getElementById('quiz-box').innerHTML = html;
-}
-
-// Fonction pour envoyer les réponses à Google Sheets
-function saveAnswer(nom, question, reponse, correct) {
+// ----- Fonction pour envoyer les réponses vers Google Sheet -----
+function sendToSheet(question, answer, correct){
     fetch("TON_URL_GOOGLE_SCRIPT", {
-        method: "POST",
-        body: JSON.stringify({ nom, question, reponse, correct })
+        method:"POST",
+        body: JSON.stringify({
+            name: window.currentStudentName,
+            question: question,
+            answer: answer,
+            correct: correct,
+            level: currentIdx+1,
+            attempt: attemptNumber
+        })
     });
 }
 </script>
+
 </body>
 </html>
