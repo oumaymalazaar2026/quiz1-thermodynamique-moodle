@@ -183,7 +183,7 @@ function renderEnd() {
 
 // Google Sheet integration
 function saveAnswer(nom, question, reponse, correct) {
-  fetch("https://script.google.com/macros/s/TON_SCRIPT_ID/exec", {
+  fetch("https://script.google.com/macros/s/AKfycby4EvK1eJDNDLztfs38tvdwwSHbuSKhEhaSb8afX_BaZ4-ZonoBMMvTFG3yI8yYDa9DZg/exec", {
     method:"POST",
     body: JSON.stringify({nom, question, reponse, correct})
   });
