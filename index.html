@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Collectionneur - Maîtrise & Réflexion</title>
+    <title>Thermo : Le Collectionneur</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes shine { 0% { background-position: -200% } 100% { background-position: 200% } }
@@ -27,7 +27,7 @@
 <header class="bg-indigo-950 text-white p-6 shadow-2xl flex justify-between items-center border-b-4 border-yellow-500">
     <div>
         <h1 class="text-2xl font-black uppercase tracking-tight">Mission : Le Collectionneur</h1>
-        <p class="text-indigo-300 text-sm italic">Apprentissage par l'erreur positive</p>
+        <p class="text-indigo-300 text-sm italic">Outils mathématiques et notions fondamentales de la thermodynamique</p>
     </div>
     <div class="text-right">
         <span class="text-xl font-bold block leading-none">LAZAAR Oumayma</span>
@@ -39,7 +39,7 @@
 
     <div class="flex justify-between items-center mb-2 px-2">
         <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Maîtrise des concepts</span>
-        <span class="text-sm font-black text-indigo-900 uppercase">Points : <span id="live-score" class="text-2xl text-indigo-600">0</span>/10</span>
+        <span class="text-sm font-black text-indigo-900 uppercase">Points : <span id="live-score" class="text-2xl text-indigo-600">0</span>/8</span>
     </div>
     <div class="mb-8 bg-slate-200 rounded-full h-3 overflow-hidden p-0.5">
         <div id="progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-500 w-0"></div>
@@ -48,9 +48,11 @@
     <section id="game-container" class="bg-white rounded-3xl shadow-xl p-6 md:p-10 mb-10 border border-slate-200 min-h-[480px] flex items-center justify-center">
         <div id="quiz-box" class="w-full">
             <div class="text-center py-10">
-                <span class="text-7xl mb-6 block">💡</span>
-                <h2 class="text-3xl font-black text-slate-800 mb-4">Prêt pour le voyage cognitif ?</h2>
-                <p class="text-slate-500 mb-8 max-w-md mx-auto italic text-lg">"L'erreur n'est pas une faute, c'est un chemin vers la connaissance."</p>
+                <span class="text-7xl mb-6 block">🔐</span>
+                <h2 class="text-3xl font-black text-slate-800 mb-4">8 Verrous à Ouvrir</h2>
+                <p class="text-slate-500 mb-8 max-w-md mx-auto italic text-lg">
+                    Calculez les dérivées et coefficients du TD1 pour vider le coffre.
+                </p>
 
                 <!-- Champ pour le nom de l'étudiant -->
                 <input id="studentName" 
@@ -63,10 +65,9 @@
                     Veuillez entrer votre nom pour commencer le quiz.
                 </p>
 
-                <!-- Bouton pour démarrer le quiz -->
                 <button onclick="startMission()" 
                         class="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 px-12 rounded-2xl shadow-lg transition-all hover:scale-105">
-                    Démarrer la Mission
+                    Lancer la Mission
                 </button>
             </div>
         </div>
@@ -75,26 +76,25 @@
     <section>
         <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
             <h3 class="text-2xl font-black text-indigo-950 uppercase flex items-center gap-3">
-                📦 Votre Collection <span id="badge-count" class="bg-indigo-950 text-white text-sm px-3 py-1 rounded-full">0</span>
+                📜 Grimoire des Concepts <span id="badge-count" class="bg-indigo-950 text-white text-sm px-3 py-1 rounded-full">0</span>
             </h3>
         </div>
         <div id="inventory-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-slate-200/50 rounded-3xl border-2 border-dashed border-slate-300 min-h-[150px]">
+            <p class="col-span-full text-center text-slate-400 py-6 italic text-sm">Votre inventaire est prêt à recevoir vos succès.</p>
         </div>
     </section>
 </main>
 
 <script>
 const originalDatabase = [
-    { q: "Qui a théorisé le constructivisme cognitif ?", options: ["Piaget", "Vygotsky", "Skinner"], correctText: "Piaget", concept: "Jean Piaget", exp: "Piaget est l'initiateur de la construction active du savoir par l'apprenant." },
-    { q: "Quel concept désigne l'écart entre ce qu'on sait faire seul et avec aide ?", options: ["L'accommodation", "La ZPD", "Le renforcement"], correctText: "La ZPD", concept: "La ZPD", exp: "La Zone de Proche Développement est le pilier du socio-constructivisme." },
-    { q: "L'intégration d'une nouvelle information dans un schéma existant est...", options: ["L'assimilation", "L'accommodation", "L'équilibration"], correctText: "L'assimilation", concept: "Assimilation", exp: "On assimile quand on intègre l'info sans modifier nos schémas internes." },
-    { q: "Modifier ses propres structures mentales pour s'adapter est...", options: ["L'assimilation", "L'accommodation", "L'imitation"], correctText: "L'accommodation", concept: "Accommodation", exp: "C'est l'effort de modification interne pour comprendre du nouveau." },
-    { q: "Quel auteur met l'accent sur les interactions sociales ?", options: ["Bruner", "Vygotsky", "Watson"], correctText: "Vygotsky", concept: "Vygotsky", exp: "Il a montré que le savoir est d'abord social avant d'être individuel." },
-    { q: "Le soutien temporaire apporté à l'élève par l'enseignant est :", options: ["Le tutorat", "L'échafaudage", "Le guidage"], correctText: "L'échafaudage", concept: "Échafaudage", exp: "Le 'Scaffolding' de Bruner est essentiel pour guider sans faire à la place de l'élève." },
-    { q: "Dans le constructivisme, l'erreur est considérée comme...", options: ["Une faute à punir", "Un outil pour apprendre", "Un manque de travail"], correctText: "Un outil pour apprendre", concept: "Erreur Positive", exp: "L'erreur permet de réajuster ses hypothèses de compréhension." },
-    { q: "Le constructivisme s'oppose à quelle vision de l'élève ?", options: ["L'élève acteur", "Le vase vide", "Le chercheur"], correctText: "Le vase vide", concept: "Apprenant Actif", exp: "L'élève n'est pas passif, il 'construit' sa réalité." },
-    { q: "Le 'conflit socio-cognitif' se produit quand...", options: ["On se bat avec un pair", "On confronte des avis différents", "On échoue seul"], correctText: "On confronte des avis différents", concept: "Conflit Social", exp: "C'est la confrontation des idées qui force le cerveau à progresser." },
-    { q: "Le savoir n'est pas transmis, il est...", options: ["Copié", "Construit", "Mémorisé"], correctText: "Construit", concept: "Savoir Construit", exp: "Le savoir est une architecture interne construite par l'apprenant." }
+    { q: "Ex 1.a : ∂f/∂x pour f(x,y)=2x²+y³ au point (x=1, y=2).", options: ["4", "3", "2"], correctText: "4", concept: "Dérivée Partielle", exp: "∂f/∂x = 4x. Pour x=1, le résultat est 4." },
+    { q: "Ex 1.c : ∂f/∂y pour f(x,y)=x²/y + y²/x au point (1,1).", options: ["1", "2", "0"], correctText: "1", concept: "Fonction Inverse", exp: "∂f/∂y = -x²/y² + 2y/x. En (1,1) : -1 + 2 = 1." },
+    { q: "Ex 2.b : Si f=x³y, calculez df pour x=1, y=1, dx=1 et dy=0.", options: ["3", "1", "0"], correctText: "3", concept: "Différentielle", exp: "df = (3x²y)dx + (x³)dy. Ici : 3*1*1 + 0 = 3." },
+    { q: "Ex 3.2 : Pour df=2xydx + x²dy, que vaut ∂²f/∂y∂x ?", options: ["2", "1", "0"], correctText: "2", concept: "Schwartz", exp: "On dérive 2xy par rapport à y. En x=1, le résultat est 2." },
+    { q: "Ex 9.f : Valeur de α.T pour un gaz parfait ?", options: ["1", "0", "-1"], correctText: "1", concept: "Gaz Parfait", exp: "α = 1/T. Donc α*T = 1." },
+    { q: "Ex 2.a : ∂f/∂x pour f=x.sin(y) au point (x=5, y=0).", options: ["0", "5", "1"], correctText: "0", concept: "Trigonométrie", exp: "∂f/∂x = sin(y). sin(0) = 0." },
+    { q: "Ex 9.d : Unité de α = (1/V)(∂V/∂T)p ?", options: ["K", "K⁻¹", "Pa⁻¹"], correctText: "K⁻¹", concept: "Unités SI", exp: "Le coefficient de dilatation α est en K⁻¹." },
+    { q: "Ex 9.c : Valeur de (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p ?", options: ["-1", "0", "1"], correctText: "-1", concept: "Relation Triple", exp: "C'est la relation cyclique fondamentale, elle vaut toujours -1." }
 ];
 
 let database = [];
@@ -141,12 +141,12 @@ function startMission() {
 
 function updateStats() {
     document.getElementById('live-score').innerText = score;
-    document.getElementById('progress-bar').style.width = `${(currentIdx / 10) * 100}%`;
+    document.getElementById('progress-bar').style.width = `${(currentIdx / database.length) * 100}%`;
     document.getElementById('badge-count').innerText = inventory.length;
 }
 
 function showQuestion() {
-    if (currentIdx >= 10) {
+    if (currentIdx >= database.length) {
         clearInterval(timer);
         renderEndScreen();
         return;
@@ -154,14 +154,10 @@ function showQuestion() {
 
     updateStats();
     const data = database[currentIdx];
-    timeLeft = TIME_LIMIT;
 
     let html = `
         <div class="card-pop w-full">
-            <div class="w-full bg-slate-100 h-2 rounded-full mb-6 overflow-hidden">
-                <div id="timer-bar" class="bg-indigo-500 h-full w-full"></div>
-            </div>
-            <span class="text-indigo-600 font-black uppercase text-[10px] tracking-[0.2em]">Étape ${currentIdx + 1} sur 10</span>
+            <span class="text-indigo-600 font-black uppercase text-[10px] tracking-[0.2em]">Verrou ${currentIdx + 1} sur ${database.length}</span>
             <h2 class="text-2xl font-bold mt-4 mb-8 text-slate-800 leading-tight">${data.q}</h2>
             <div class="grid gap-4">
     `;
@@ -174,26 +170,9 @@ function showQuestion() {
     });
     html += `</div></div>`;
     document.getElementById('quiz-box').innerHTML = html;
-
-    startTimer();
-}
-
-function startTimer() {
-    const bar = document.getElementById('timer-bar');
-    clearInterval(timer);
-    timer = setInterval(() => {
-        timeLeft--;
-        bar.style.width = (timeLeft / TIME_LIMIT) * 100 + "%";
-        if (timeLeft <= 5) bar.style.backgroundColor = "#ef4444";
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            handleSelection("TEMPS ÉCOULÉ");
-        }
-    }, 1000);
 }
 
 function handleSelection(selectedText) {
-    clearInterval(timer);
     const data = database[currentIdx];
     const studentName = window.currentStudentName || "Anonyme";
     const isCorrect = selectedText === data.correctText;
@@ -204,39 +183,22 @@ function handleSelection(selectedText) {
         score++;
         generateLoot(data.concept);
         userChoices.push({ selected: selectedText, correct: true });
-
-        let feedbackHtml = `
+        document.getElementById('quiz-box').innerHTML = `
             <div class="card-pop text-center py-6">
-                <div class="text-6xl mb-6">✨</div>
-                <h2 class="text-3xl font-black text-green-600 mb-4">Excellent !</h2>
-                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">
-                    Vous avez parfaitement saisi ce concept. Continuez votre exploration !
-                </p>
-                <button onclick="proceedToNext()" 
-                        class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">
-                    Continuer
-                </button>
-            </div>
-        `;
-        document.getElementById('quiz-box').innerHTML = feedbackHtml;
-
+                <div class="text-6xl mb-6">🔓</div>
+                <h2 class="text-3xl font-black text-green-600 mb-4">Correct !</h2>
+                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">${data.exp}</p>
+                <button onclick="proceedToNext()" class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">Continuer</button>
+            </div>`;
     } else {
         userChoices.push({ selected: selectedText, correct: false });
-
-        let feedbackHtml = `
+        document.getElementById('quiz-box').innerHTML = `
             <div class="card-pop text-center py-6">
-                <div class="text-6xl mb-6">🧐</div>
-                <h2 class="text-3xl font-black text-amber-600 mb-4">Pensez-y encore...</h2>
-                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">
-                    Cette notion mérite une réflexion plus approfondie. Essayez encore !
-                </p>
-                <button onclick="showQuestion()" 
-                    class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">
-                    Revoir la question
-                </button>
-            </div>
-        `;
-        document.getElementById('quiz-box').innerHTML = feedbackHtml;
+                <div class="text-6xl mb-6">🚨</div>
+                <h2 class="text-3xl font-black text-amber-600 mb-4">Incorrect</h2>
+                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">${data.exp}</p>
+                <button onclick="proceedToNext()" class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">Suivant</button>
+            </div>`;
     }
 }
 
@@ -248,8 +210,7 @@ function proceedToNext() {
 function generateLoot(conceptName) {
     const rand = Math.random();
     let rarity = rand > 0.85 ? "legendary" : (rand > 0.60 ? "rare" : "common");
-    let emoji = rarity === "legendary" ? "⭐" : (rarity === "rare" ? "✨" : "📜");
-    inventory.push({ name: conceptName, rarity: rarity, emoji: emoji });
+    inventory.push({ name: conceptName, rarity: rarity, emoji: "📜" });
     renderInventory();
 }
 
@@ -269,24 +230,21 @@ function renderInventory() {
 
 function renderEndScreen() {
     updateStats();
-    let mention = score === 10 ? "GRAND MAÎTRE" : (score >= 7 ? "EXPERT" : "APPRENTI");
-    
+    let mention = score === database.length ? "GRAND MAÎTRE" : (score >= database.length*0.7 ? "EXPERT" : "APPRENTI");
     document.getElementById('quiz-box').innerHTML = `
         <div class="text-center py-4 card-pop">
-            ${score === 10 ? '<div class="badge-glow text-8xl mb-6">🎖️</div>' : '<div class="text-6xl mb-6">🏁</div>'}
-            <h2 class="text-6xl font-black text-indigo-950 mb-2">${score}/10</h2>
+            ${score === database.length ? '<div class="badge-glow text-8xl mb-6">🎖️</div>' : '<div class="text-6xl mb-6">🏁</div>'}
+            <h2 class="text-6xl font-black text-indigo-950 mb-2">${score}/${database.length}</h2>
             <p class="text-xl font-bold text-slate-500 mb-10 tracking-widest uppercase">STATUT : ${mention}</p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
                 <button onclick="showDetailedCorrection()" class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black hover:bg-indigo-700 shadow-xl transition-all">ANALYSER LE RAPPORT</button>
                 <button onclick="location.reload()" class="bg-slate-200 text-slate-700 px-10 py-4 rounded-2xl font-bold hover:bg-slate-300 transition">RECOMMENCER</button>
             </div>
-        </div>
-    `;
+        </div>`;
 }
 
 function showDetailedCorrection() {
     let html = `<div class="card-pop text-left max-w-3xl mx-auto"><h2 class="text-2xl font-black text-indigo-950 uppercase mb-6 border-b pb-4 tracking-tighter">Rapport de Maîtrise</h2><div class="space-y-4 max-h-[500px] overflow-y-auto pr-4">`;
-
     database.forEach((data, i) => {
         const uc = userChoices[i];
         html += `
@@ -297,22 +255,19 @@ function showDetailedCorrection() {
                 <div class="mt-4 p-4 bg-white/80 rounded-2xl text-xs text-slate-600 border border-white leading-relaxed italic">
                     <strong>Note pédagogique :</strong> ${data.exp}
                 </div>
-            </div>
-        `;
+            </div>`;
     });
-
     html += `</div><button onclick="renderEndScreen()" class="mt-6 w-full py-4 bg-slate-100 font-bold rounded-xl hover:bg-slate-200 transition">Fermer le rapport</button></div>`;
     document.getElementById('quiz-box').innerHTML = html;
 }
 
 // Fonction pour envoyer les réponses à Google Sheets
 function saveAnswer(nom, question, reponse, correct) {
-    fetch("https://script.google.com/macros/s/AKfycbxNodIwPH_0NLz_dModyVYDjOCXeddBHSo4ziFljKhv2d09uRi9FTdC9sCppVIkLtBXNQ/exec", {
+    fetch("TON_URL_GOOGLE_SCRIPT", {
         method: "POST",
         body: JSON.stringify({ nom, question, reponse, correct })
     });
 }
 </script>
-
 </body>
 </html>
