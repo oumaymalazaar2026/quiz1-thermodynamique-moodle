@@ -37,7 +37,6 @@
 
 <main class="flex-grow p-4 md:p-8 max-w-5xl mx-auto w-full">
 
-    <!-- Score et progression -->
     <div class="flex justify-between items-center mb-2 px-2">
         <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Maîtrise des concepts</span>
         <span class="text-sm font-black text-indigo-900 uppercase">Points : <span id="live-score" class="text-2xl text-indigo-600">0</span>/10</span>
@@ -46,39 +45,42 @@
         <div id="progress-bar" class="bg-indigo-600 h-full rounded-full transition-all duration-500 w-0"></div>
     </div>
 
-    <!-- Écran du quiz -->
     <section id="game-container" class="bg-white rounded-3xl shadow-xl p-6 md:p-10 mb-10 border border-slate-200 min-h-[480px] flex items-center justify-center">
-        <div id="quiz-box" class="w-full text-center py-10">
+        <div id="quiz-box" class="w-full">
+            <div class="text-center py-10">
+                <span class="text-7xl mb-6 block">💡</span>
+                <h2 class="text-3xl font-black text-slate-800 mb-4">Prêt pour le voyage cognitif ?</h2>
+                <p class="text-slate-500 mb-8 max-w-md mx-auto italic text-lg">"L'erreur n'est pas une faute, c'est un chemin vers la connaissance."</p>
 
-            <!-- Écran de bienvenue -->
-            <span class="text-7xl mb-6 block">💡</span>
-            <h2 class="text-3xl font-black text-slate-800 mb-4">Prêt pour le voyage cognitif ?</h2>
-            <p class="text-slate-500 mb-8 max-w-md mx-auto italic text-lg">
-                "L'erreur n'est pas une faute, c'est un chemin vers la connaissance."
-            </p>
+                <!-- Champ pour le nom de l'étudiant -->
+                <input id="studentName" 
+                       type="text" 
+                       placeholder="Entrez votre nom" 
+                       class="mb-2 px-4 py-3 rounded-xl border border-slate-300 w-80 text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 
-            <input id="studentName" type="text" placeholder="Entrez votre nom"
-                   class="mb-2 px-4 py-3 rounded-xl border border-slate-300 w-80 text-center font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-            <p id="nameError" class="text-red-600 text-sm hidden mb-4">Veuillez entrer votre nom pour commencer le quiz.</p>
+                <!-- Message d'erreur si nom vide -->
+                <p id="nameError" class="text-red-600 text-sm hidden mb-4">
+                    Veuillez entrer votre nom pour commencer le quiz.
+                </p>
 
-            <button onclick="startMission()"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 px-12 rounded-2xl shadow-lg">
-                Démarrer la Mission
-            </button>
-
+                <!-- Bouton pour démarrer le quiz -->
+                <button onclick="startMission()" 
+                        class="bg-indigo-600 hover:bg-indigo-700 text-white text-xl font-bold py-4 px-12 rounded-2xl shadow-lg transition-all hover:scale-105">
+                    Démarrer la Mission
+                </button>
+            </div>
         </div>
     </section>
 
-    <!-- Inventaire -->
     <section>
         <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
             <h3 class="text-2xl font-black text-indigo-950 uppercase flex items-center gap-3">
                 📦 Votre Collection <span id="badge-count" class="bg-indigo-950 text-white text-sm px-3 py-1 rounded-full">0</span>
             </h3>
         </div>
-        <div id="inventory-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-slate-200/50 rounded-3xl border-2 border-dashed border-slate-300 min-h-[150px]"></div>
+        <div id="inventory-grid" class="grid grid-cols-2 md:grid-cols-5 gap-4 p-6 bg-slate-200/50 rounded-3xl border-2 border-dashed border-slate-300 min-h-[150px]">
+        </div>
     </section>
-
 </main>
 
 <script>
@@ -126,7 +128,6 @@ function startMission() {
 
     window.currentStudentName = studentName;
 
-    // Préparer le quiz
     database = shuffleArray([...originalDatabase]);
     database.forEach(q => q.options = shuffleArray([...q.options]));
     currentIdx = 0;
@@ -191,12 +192,10 @@ function startTimer() {
     }, 1000);
 }
 
-// Nouvelle version avec DEUXIÈME CHANCE
 function handleSelection(selectedText) {
     clearInterval(timer);
     const data = database[currentIdx];
     const studentName = window.currentStudentName || "Anonyme";
-
     const isCorrect = selectedText === data.correctText;
 
     saveAnswer(studentName, data.q, selectedText, isCorrect);
@@ -205,10 +204,25 @@ function handleSelection(selectedText) {
         score++;
         generateLoot(data.concept);
         userChoices.push({ selected: selectedText, correct: true });
-        currentIdx++;
-        showQuestion();
+
+        let feedbackHtml = `
+            <div class="card-pop text-center py-6">
+                <div class="text-6xl mb-6">✨</div>
+                <h2 class="text-3xl font-black text-green-600 mb-4">Excellent !</h2>
+                <p class="text-slate-600 mb-8 px-6 max-w-md mx-auto italic">
+                    Vous avez parfaitement saisi ce concept. Continuez votre exploration !
+                </p>
+                <button onclick="proceedToNext()" 
+                        class="bg-slate-900 text-white px-12 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg">
+                    Continuer
+                </button>
+            </div>
+        `;
+        document.getElementById('quiz-box').innerHTML = feedbackHtml;
+
     } else {
         userChoices.push({ selected: selectedText, correct: false });
+
         let feedbackHtml = `
             <div class="card-pop text-center py-6">
                 <div class="text-6xl mb-6">🧐</div>
@@ -224,6 +238,11 @@ function handleSelection(selectedText) {
         `;
         document.getElementById('quiz-box').innerHTML = feedbackHtml;
     }
+}
+
+function proceedToNext() {
+    currentIdx++;
+    showQuestion();
 }
 
 function generateLoot(conceptName) {
@@ -251,7 +270,7 @@ function renderInventory() {
 function renderEndScreen() {
     updateStats();
     let mention = score === 10 ? "GRAND MAÎTRE" : (score >= 7 ? "EXPERT" : "APPRENTI");
-
+    
     document.getElementById('quiz-box').innerHTML = `
         <div class="text-center py-4 card-pop">
             ${score === 10 ? '<div class="badge-glow text-8xl mb-6">🎖️</div>' : '<div class="text-6xl mb-6">🏁</div>'}
@@ -286,14 +305,14 @@ function showDetailedCorrection() {
     document.getElementById('quiz-box').innerHTML = html;
 }
 
-// Fonction pour enregistrer la réponse
+// Fonction pour envoyer les réponses à Google Sheets
 function saveAnswer(nom, question, reponse, correct) {
     fetch("https://script.google.com/macros/s/AKfycbxNodIwPH_0NLz_dModyVYDjOCXeddBHSo4ziFljKhv2d09uRi9FTdC9sCppVIkLtBXNQ/exec", {
         method: "POST",
         body: JSON.stringify({ nom, question, reponse, correct })
     });
 }
-
 </script>
+
 </body>
 </html>
