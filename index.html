@@ -6,189 +6,148 @@
 <title>Thermo : Le Code du Coffre</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  .vault-wheel {
-    background: linear-gradient(#3e2723, #5d4037, #3e2723);
-    border: 2px solid #d4a373;
-    text-shadow: 0 0 10px rgba(250, 237, 205, 0.5);
-  }
-  .bg-antique { background-color: #f5f2e9; background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); }
-  .rarity-gold { border: 2px solid #b8860b; background: linear-gradient(135deg, #ffd700, #faf5b1); }
-  @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-  .shake { animation: shake 0.2s ease-in-out 0s 2; }
+/* Couleurs marron/beige */
+body { background-color: #f5f2e9; color: #3e2723; font-family: sans-serif; }
+.vault-wheel { background: linear-gradient(#3e2723, #5d4037, #3e2723); border: 2px solid #d4a373; text-shadow: 0 0 10px rgba(250,237,205,0.5);}
+.bg-antique { background-color: #f5f2e9; }
+.rarity-gold { border: 2px solid #b8860b; background: linear-gradient(135deg, #ffd700, #faf5b1); }
+@keyframes shake { 0%,100%{transform:translateX(0);}25%{transform:translateX(-5px);}75%{transform:translateX(5px);} }
+.shake { animation: shake 0.2s ease-in-out 0s 2; }
 </style>
 </head>
-<body class="bg-antique min-h-screen font-sans text-stone-900">
+<body class="bg-antique min-h-screen">
 
 <header class="bg-[#3e2723] text-[#faedcd] p-4 shadow-xl border-b-4 border-[#bc6c25] flex justify-between items-center">
-  <h1 class="font-black uppercase tracking-tighter">Mission : Le Code du Coffre</h1>
-  <div class="text-right border-l border-[#d4a373] pl-4">
-    <input id="studentName" type="text" placeholder="Entrez votre nom" class="bg-[#faedcd] text-[#3e2723] px-2 py-1 rounded font-bold focus:outline-none"/>
-  </div>
+<h1 class="font-black uppercase tracking-tighter">Mission : Le Code du Coffre</h1>
+<div class="text-right border-l border-[#d4a373] pl-4">
+<span class="text-sm font-bold block uppercase" id="student-name-display">TON NOM ICI</span>
+</div>
 </header>
 
 <main class="p-6 max-w-2xl mx-auto">
-  <div class="flex justify-between text-[10px] font-bold uppercase mb-1 text-stone-500">
-    <span>Sécurité du Coffre</span>
-    <span id="score-text">Niveau 0/5</span>
-  </div>
-  <div class="h-2 bg-stone-300 rounded-full mb-8 overflow-hidden">
-    <div id="prog-bar" class="h-full bg-[#8b4513] w-0 transition-all duration-500"></div>
-  </div>
+<div id="quiz-content" class="text-center py-12">
+<input id="studentName" type="text" placeholder="Entrez votre nom" class="mb-4 px-4 py-2 rounded border border-[#d4a373] text-center font-bold">
+<p id="nameError" class="text-red-700 text-sm hidden mb-4">Veuillez entrer votre nom pour commencer.</p>
+<button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] px-12 py-4 rounded-xl font-bold hover:scale-105 transition-all">Commencer</button>
+</div>
 
-  <section id="game-zone" class="bg-white rounded-3xl shadow-2xl p-8 border-2 border-stone-200 relative">
-    <div id="quiz-content">
-      <div class="text-center py-12">
-        <div class="text-6xl mb-6">🔐</div>
-        <h2 class="text-2xl font-black text-[#3e2723] mb-4 uppercase">Déchiffrez les Dérivées</h2>
-        <p class="text-stone-500 italic mb-8">Calculez les valeurs exactes pour déverrouiller le savoir thermodynamique.</p>
-        <button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] px-12 py-4 rounded-xl font-bold hover:scale-105 transition-all">Commencer</button>
-      </div>
-    </div>
-  </section>
+<div class="flex justify-between text-[10px] font-bold uppercase mb-1 text-stone-500 mt-6">
+<span>Sécurité du Coffre</span>
+<span id="score-text">Niveau 0/5</span>
+</div>
+<div class="h-2 bg-stone-300 rounded-full mb-8 overflow-hidden">
+<div id="prog-bar" class="h-full bg-[#8b4513] w-0 transition-all duration-500"></div>
+</div>
 
-  <div id="inventory" class="mt-10 grid grid-cols-5 gap-2"></div>
+<section id="inventory" class="mt-10 grid grid-cols-5 gap-2"></section>
 </main>
 
 <script>
+// Questions et réponses
 const questions = [
-  { q: "Calculer ∂f/∂x pour f(x,y)=2x²+y³ au point (x=1, y=2).", answer: "4", hint: "La dérivée est 4x. Remplacez x par 1." },
-  { q: "Pour f(x,y)=x²/y + y²/x, calculez ∂f/∂y au point (1,1).", answer: "-1", hint: "La dérivée est -x²/y² + 2y/x. Remplacez x=1, y=1." },
-  { q: "Calculez df pour f=2xy+x au point (1,1) si dx=1 et dy=0.", answer: "3", hint: "df = (2y+1)dx + (2x)dy. Ici 3*1 + 2*0." },
-  { q: "Valeur de α.V.T pour un gaz parfait si nR=1 ?", answer: "1", hint: "α = 1/T pour un gaz parfait. Donc (1/T)*V*T = V. Si nR=1 et P=1, V=T." },
-  { q: "Si f(x,y)=x*cos(y), que vaut ∂²f/∂y∂x au point (1, 0) ?", answer: "0", hint: "∂f/∂x = cos(y). Dérivez ensuite cos(y) par rapport à y -> -sin(y). sin(0)=0." }
+{ q: "Calculer ∂f/∂x pour f(x,y)=2x²+y³ au point (x=1, y=2).", answer: "4", hint: "La dérivée est 4x. Remplacez x par 1." },
+{ q: "Pour f(x,y)=x²/y + y²/x, calculez ∂f/∂y au point (1,1).", answer: "-1", hint: "La dérivée est -x²/y² + 2y/x. Remplacez x=1, y=1." },
+{ q: "Calculez df pour f=2xy+x au point (1,1) si dx=1 et dy=0.", answer: "3", hint: "df = (2y+1)dx + (2x)dy. Ici 3*1 + 2*0." },
+{ q: "Valeur de α.V.T pour un gaz parfait si nR=1 ?", answer: "1", hint: "α = 1/T pour un gaz parfait. Donc (1/T)*V*T = V. Si nR=1 et P=1, V=T." },
+{ q: "Si f(x,y)=x*cos(y), que vaut ∂²f/∂y∂x au point (1, 0) ?", answer: "0", hint: "∂f/∂x = cos(y). Dérivez ensuite cos(y) par rapport à y -> -sin(y). sin(0)=0." }
 ];
 
-let currentIdx = 0;
-let hasRetried = false;
-let score = 0;
-let studentName = '';
+let currentIdx=0, hasRetried=false, score=0, currentSign='+', currentNum='0', studentName='';
+const SHEET_URL = "TON_URL_APPS_SCRIPT_ICI"; // <-- Mets ici ton URL Apps Script
 
 function startMission() {
-  studentName = document.getElementById('studentName').value.trim();
-  if(!studentName) { alert("Veuillez entrer votre nom pour commencer."); return; }
-  currentIdx = 0; score = 0; hasRetried = false; renderQuestion();
+    studentName = document.getElementById('studentName').value.trim();
+    if(!studentName){document.getElementById('nameError').classList.remove('hidden'); return;}
+    document.getElementById('nameError').classList.add('hidden');
+    document.getElementById('student-name-display').innerText = studentName;
+    currentIdx=0; score=0; hasRetried=false; renderQuestion();
 }
 
-function renderQuestion() {
-  const data = questions[currentIdx];
-  document.getElementById('quiz-content').innerHTML = `
+function renderQuestion(){
+    const data = questions[currentIdx];
+    document.getElementById('quiz-content').innerHTML = `
     <div class="text-center">
-      <p class="text-[10px] font-bold text-stone-400 uppercase mb-2">Énigme ${currentIdx + 1}</p>
-      <h2 class="text-xl font-mono font-bold text-[#3e2723] mb-8 p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300">${data.q}</h2>
-      <div class="flex justify-center gap-4 mb-10">
+    <p class="text-xs font-bold text-stone-400 uppercase mb-2">Énigme Mathématique ${currentIdx+1}</p>
+    <h2 class="text-xl font-mono font-bold text-[#3e2723] mb-4 p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300">${data.q}</h2>
+    <div class="flex justify-center gap-4 mb-6">
         ${renderWheel('sign')}
         ${renderWheel('num')}
-      </div>
-      <div class="flex flex-col gap-3">
-        <button onclick="checkCode()" class="bg-[#3e2723] text-[#faedcd] py-4 rounded-xl font-black uppercase tracking-widest shadow-lg">Tenter le Code</button>
-        <p id="retry-msg" class="text-xs text-orange-700 font-bold h-4"></p>
-      </div>
     </div>
-  `;
-  updateUI();
+    <button onclick="checkCode()" class="bg-[#3e2723] text-[#faedcd] py-3 px-8 rounded-xl font-bold">Tenter le Code</button>
+    <p id="retry-msg" class="text-xs text-orange-700 font-bold mt-2 h-4"></p>
+    </div>`;
+    updateUI();
 }
 
-function renderWheel(type) {
-  const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
-  return `<div class="flex flex-col items-center">
-    <button onclick="spin('${type}',1)" class="text-[#8b4513] text-xl font-bold">▲</button>
-    <div id="wheel-${type}" class="vault-wheel w-16 h-20 flex items-center justify-center text-3xl font-black text-white rounded-xl my-2 shadow-inner">${vals[0]}</div>
-    <button onclick="spin('${type}',-1)" class="text-[#8b4513] text-xl font-bold">▼</button>
-  </div>`;
+function renderWheel(type){
+    const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
+    const val = type==='sign'?currentSign:currentNum;
+    return `<div class="flex flex-col items-center">
+        <button onclick="spin('${type}',1)" class="text-[#8b4513] font-bold text-xl">▲</button>
+        <div id="wheel-${type}" class="vault-wheel w-16 h-20 flex items-center justify-center text-3xl font-black text-white rounded-xl my-2 shadow-inner">${val}</div>
+        <button onclick="spin('${type}',-1)" class="text-[#8b4513] font-bold text-xl">▼</button>
+    </div>`;
 }
 
-let currentSign = '+', currentNum = '0';
-
-function spin(type, dir) {
-  const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
-  if(type==='sign') {
-    currentSign = currentSign==='+'?'-':'+';
-    document.getElementById('wheel-sign').innerText = currentSign;
-  } else {
-    let idx = vals.indexOf(currentNum);
-    idx = (idx+dir+vals.length)%vals.length;
-    currentNum = vals[idx];
-    document.getElementById('wheel-num').innerText = currentNum;
-  }
+function spin(type, dir){
+    const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
+    if(type==='sign'){
+        currentSign = currentSign==='+'?'-':'+';
+        document.getElementById('wheel-sign').innerText=currentSign;
+    } else {
+        let idx = vals.indexOf(currentNum);
+        idx = (idx+dir+vals.length)%vals.length;
+        currentNum = vals[idx];
+        document.getElementById('wheel-num').innerText=currentNum;
+    }
 }
 
-function checkCode() {
-  const userAns = (currentSign==='-'?'-':'') + currentNum;
-  const finalAns = userAns.replace('+','');
-  const data = questions[currentIdx];
-  if(finalAns==data.answer) success();
-  else fail();
+function checkCode(){
+    const userAns = (currentSign==='-'?'-':'')+currentNum;
+    const finalAns = userAns.replace('+','');
+    const data = questions[currentIdx];
+    if(finalAns==data.answer){ success(); sendToSheet(data, finalAns,true); }
+    else { fail(); sendToSheet(data, finalAns,false); }
 }
 
-function success() {
-  score++;
-  addBadge(questions[currentIdx].answer);
-  saveAnswer(studentName, questions[currentIdx].q, questions[currentIdx].answer, true);
-  document.getElementById('quiz-content').innerHTML = `
-    <div class="text-center py-10 animate-bounce">
-      <div class="text-6xl mb-4">🔓</div>
-      <h2 class="text-2xl font-black text-green-700">CODE ACCEPTÉ !</h2>
-      <p class="text-stone-500 mt-2 italic">Excellent, continuez !</p>
-      <button onclick="next()" class="mt-8 bg-[#3e2723] text-white px-8 py-3 rounded-lg">Suivant</button>
-    </div>
-  `;
+function success(){
+    score++; addBadge(questions[currentIdx].answer);
+    document.getElementById('retry-msg').innerText="Excellent ! Continuez de répondre";
+    setTimeout(next, 1500);
 }
 
-function fail() {
-  const container = document.getElementById('game-zone');
-  container.classList.add('shake');
-  setTimeout(() => container.classList.remove('shake'), 400);
-  if(!hasRetried) {
-    hasRetried = true;
-    document.getElementById('retry-msg').innerText = "CODE ERRONÉ : UNE DERNIÈRE TENTATIVE !";
-  } else {
-    saveAnswer(studentName, questions[currentIdx].q, currentSign+currentNum, false);
-    document.getElementById('quiz-content').innerHTML = `
-      <div class="text-center py-10">
-        <div class="text-6xl mb-4">🚨</div>
-        <h2 class="text-2xl font-black text-red-700">COFFRE BLOQUÉ</h2>
-        <p class="text-stone-500 mt-2 px-4">La solution était ${questions[currentIdx].answer}.<br><small>${questions[currentIdx].hint}</small></p>
-        <button onclick="next()" class="mt-8 bg-stone-200 px-8 py-3 rounded-lg">Continuer</button>
-      </div>
-    `;
-  }
+function fail(){
+    if(!hasRetried){ hasRetried=true; document.getElementById('retry-msg').innerText="CODE ERRONÉ : UNE DERNIÈRE TENTATIVE !";}
+    else { document.getElementById('retry-msg').innerText=`Mauvaise réponse. Solution: ${questions[currentIdx].answer}`; setTimeout(next,2000);}
 }
 
-function next() {
-  currentIdx++;
-  hasRetried = false;
-  currentSign = '+'; currentNum = '0';
-  if(currentIdx < questions.length) renderQuestion();
-  else renderEnd();
+function next(){currentIdx++; hasRetried=false; currentSign='+'; currentNum='0'; if(currentIdx<questions.length) renderQuestion(); else renderEnd();}
+
+function addBadge(val){
+    document.getElementById('inventory').innerHTML+=`<div class="h-12 w-12 rounded-full rarity-gold flex items-center justify-center font-black text-[#3e2723] border shadow-md text-xs">${val}</div>`;
 }
 
-function addBadge(val) {
-  document.getElementById('inventory').innerHTML += `<div class="h-12 w-12 rounded-full rarity-gold flex items-center justify-center font-black text-[#3e2723] border shadow-md text-xs">${val}</div>`;
+function updateUI(){
+    document.getElementById('prog-bar').style.width=(currentIdx/questions.length*100)+'%';
+    document.getElementById('score-text').innerText=`Niveau ${currentIdx}/${questions.length}`;
 }
 
-function updateUI() {
-  document.getElementById('prog-bar').style.width = (currentIdx/questions.length*100)+"%";
-  document.getElementById('score-text').innerText = `Niveau ${currentIdx}/${questions.length}`;
+// Envoi des réponses à Google Sheet
+function sendToSheet(q, reponse, correct){
+    fetch(SHEET_URL,{method:'POST',body:JSON.stringify({nom:studentName,question:q.q,reponse,reponse,correct})});
 }
 
-function renderEnd() {
-  document.getElementById('quiz-content').innerHTML = `
-    <div class="text-center">
-      <h2 class="text-5xl font-black text-[#3e2723]">${score}/${questions.length}</h2>
-      <p class="font-bold text-stone-400 uppercase tracking-widest text-sm">Expertise du Coffre-Fort</p>
-      <button onclick="location.reload()" class="mt-10 bg-[#3e2723] text-white px-10 py-4 rounded-xl font-bold">Réinitialiser le système</button>
-    </div>
-  `;
-}
-
-// Google Sheet integration
-function saveAnswer(nom, question, reponse, correct) {
-  fetch("https://script.google.com/macros/s/AKfycby4EvK1eJDNDLztfs38tvdwwSHbuSKhEhaSb8afX_BaZ4-ZonoBMMvTFG3yI8yYDa9DZg/exec", {
-    method:"POST",
-    body: JSON.stringify({nom, question, reponse, correct})
-  });
+function renderEnd(){
+    document.getElementById('quiz-content').innerHTML=`
+    <div class="text-center py-10">
+        <div class="text-6xl mb-4">🎉</div>
+        <h2 class="text-2xl font-black text-[#3e2723]">FIN DE LA MISSION</h2>
+        <p class="text-stone-500 mt-2">Score : ${score}/${questions.length}</p>
+        <p class="text-stone-500 mt-2">Solutions et explications visibles.</p>
+        ${questions.map((q,i)=>`<div class="mt-2 p-2 border rounded bg-stone-100"><strong>Q${i+1}:</strong> ${q.q}<br><strong>Réponse:</strong> ${q.answer}<br><em>${q.hint}</em></div>`).join('')}
+        <button onclick="location.reload()" class="mt-6 bg-[#3e2723] text-[#faedcd] px-8 py-3 rounded-xl font-bold">Recommencer</button>
+    </div>`;
 }
 </script>
-
 </body>
 </html>
