@@ -3,180 +3,190 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thermo : Le Code du Coffre (8 Niveaux)</title>
+<title>Thermo : Le Code du Coffre</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-    body { background-color: #f5f2e9; font-family: sans-serif; }
-    .vault-wheel { background: linear-gradient(#3e2723, #5d4037, #3e2723); border: 2px solid #d4a373; color: white; font-weight: bold; border-radius: 0.5rem; text-shadow: 0 0 10px rgba(250,237,205,0.5);}
-    .shake { animation: shake 0.2s ease-in-out 0s 2; }
-    @keyframes shake { 0%,100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
-    .card-pop { animation: pop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); }
-    @keyframes pop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .rarity-gold { border: 2px solid #b8860b; background: linear-gradient(135deg, #ffd700, #faf5b1); box-shadow: 0 4px 10px rgba(184,134,11,0.3);}
+  .vault-wheel {
+    background: linear-gradient(#3e2723, #5d4037, #3e2723);
+    border: 2px solid #d4a373;
+    text-shadow: 0 0 10px rgba(250, 237, 205, 0.5);
+  }
+  .bg-antique { background-color: #f5f2e9; background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); }
+  .rarity-gold { border: 2px solid #b8860b; background: linear-gradient(135deg, #ffd700, #faf5b1); }
+  @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+  .shake { animation: shake 0.2s ease-in-out 0s 2; }
 </style>
 </head>
-<body class="bg-antique min-h-screen text-stone-900">
+<body class="bg-antique min-h-screen font-sans text-stone-900">
 
 <header class="bg-[#3e2723] text-[#faedcd] p-4 shadow-xl border-b-4 border-[#bc6c25] flex justify-between items-center">
-    <div>
-        <h1 class="font-black uppercase tracking-tighter text-xl">Mission : Le Coffre-Fort</h1>
-        <p class="text-[10px] text-[#d4a373] uppercase tracking-widest font-bold">TD1 : Outils Mathématiques</p>
-    </div>
-    <div class="text-right border-l border-[#d4a373] pl-4">
-        <input id="studentName" type="text" placeholder="Votre nom" class="px-2 py-1 rounded text-[#3e2723] font-bold" />
-    </div>
+  <h1 class="font-black uppercase tracking-tighter">Mission : Le Code du Coffre</h1>
+  <div class="text-right border-l border-[#d4a373] pl-4">
+    <input id="studentName" type="text" placeholder="Entrez votre nom" class="bg-[#faedcd] text-[#3e2723] px-2 py-1 rounded font-bold focus:outline-none"/>
+  </div>
 </header>
 
 <main class="p-6 max-w-2xl mx-auto">
+  <div class="flex justify-between text-[10px] font-bold uppercase mb-1 text-stone-500">
+    <span>Sécurité du Coffre</span>
+    <span id="score-text">Niveau 0/5</span>
+  </div>
+  <div class="h-2 bg-stone-300 rounded-full mb-8 overflow-hidden">
+    <div id="prog-bar" class="h-full bg-[#8b4513] w-0 transition-all duration-500"></div>
+  </div>
 
-    <div class="flex justify-between text-[10px] font-bold uppercase mb-1 text-stone-500">
-        <span>Déchiffrement en cours</span>
-        <span id="score-text">Niveau 0/8</span>
+  <section id="game-zone" class="bg-white rounded-3xl shadow-2xl p-8 border-2 border-stone-200 relative">
+    <div id="quiz-content">
+      <div class="text-center py-12">
+        <div class="text-6xl mb-6">🔐</div>
+        <h2 class="text-2xl font-black text-[#3e2723] mb-4 uppercase">Déchiffrez les Dérivées</h2>
+        <p class="text-stone-500 italic mb-8">Calculez les valeurs exactes pour déverrouiller le savoir thermodynamique.</p>
+        <button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] px-12 py-4 rounded-xl font-bold hover:scale-105 transition-all">Commencer</button>
+      </div>
     </div>
-    <div class="h-3 bg-stone-300 rounded-full mb-8 overflow-hidden p-0.5 border border-stone-200">
-        <div id="prog-bar" class="h-full bg-[#8b4513] w-0 transition-all duration-700 rounded-full"></div>
-    </div>
+  </section>
 
-    <section id="game-zone" class="bg-white rounded-3xl shadow-2xl p-8 border-2 border-stone-200 relative overflow-hidden">
-        <div id="quiz-content" class="text-center py-12">
-            <div class="text-7xl mb-6">🔐</div>
-            <h2 class="text-3xl font-black text-[#3e2723] mb-4 uppercase tracking-tighter">8 Verrous à Ouvrir</h2>
-            <p class="text-stone-500 italic mb-10 max-w-xs mx-auto">Calculez les dérivées et coefficients du TD1 pour vider le coffre.</p>
-            <button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] px-12 py-4 rounded-xl font-bold hover:bg-black transition-all shadow-xl active:scale-95">Lancer l'Analyse</button>
-        </div>
-    </section>
-
-    <div class="mt-12">
-        <h3 class="text-xs font-black text-[#3e2723] uppercase mb-4 tracking-widest border-b border-stone-300 pb-2">📜 Grimoire des Concepts (Badges)</h3>
-        <div id="inventory" class="flex flex-wrap gap-3 justify-start min-h-[60px]">
-            <p id="empty-inv" class="text-xs italic text-stone-400">Réussissez un calcul pour gagner un badge...</p>
-        </div>
-    </div>
+  <div id="inventory" class="mt-10 grid grid-cols-5 gap-2"></div>
 </main>
 
 <script>
 const questions = [
-    {id:1, concept:"Dérivée Partielle", q:"Ex 1.a : ∂f/∂x pour f(x,y)=2x²+y³ au point (1,2).", answer:"4", hint:"∂f/∂x = 4x → x=1 ⇒ 4"},
-    {id:2, concept:"Fonction Inverse", q:"Ex 1.c : ∂f/∂y pour f(x,y)=x²/y + y²/x au point (1,1).", answer:"1", hint:"∂f/∂y = -x²/y² + 2y/x → 1"},
-    {id:3, concept:"Différentielle", q:"Ex 2.b : Si f=x³y, calculez df pour x=1,y=1,dx=1,dy=0.", answer:"3", hint:"df = (3x²y)dx + x³dy =3"},
-    {id:4, concept:"Schwartz", q:"Ex 3.2 : df=2xydx + x²dy, ∂²f/∂y∂x ?", answer:"2", hint:"Dériver 2xy par y → 2x"},
-    {id:5, concept:"Gaz Parfait", q:"Ex 9.f : Valeur de α.T ?", answer:"1", hint:"α = 1/T → α*T =1"},
-    {id:6, concept:"Trigonométrie", q:"Ex 2.a : ∂f/∂x pour f=x*sin(y) au point (5,0).", answer:"0", hint:"sin(0)=0"},
-    {id:7, concept:"Unités SI", q:"Ex 9.d : Unité α = (1/V)(∂V/∂T)p ? (0:K,1:K⁻¹,2:Pa⁻¹)", answer:"1", hint:"α en K⁻¹"},
-    {id:8, concept:"Relation Triple", q:"Ex 9.c : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p ?", answer:"-1", hint:"Relation cyclique = -1"}
+  { q: "Calculer ∂f/∂x pour f(x,y)=2x²+y³ au point (x=1, y=2).", answer: "4", hint: "La dérivée est 4x. Remplacez x par 1." },
+  { q: "Pour f(x,y)=x²/y + y²/x, calculez ∂f/∂y au point (1,1).", answer: "-1", hint: "La dérivée est -x²/y² + 2y/x. Remplacez x=1, y=1." },
+  { q: "Calculez df pour f=2xy+x au point (1,1) si dx=1 et dy=0.", answer: "3", hint: "df = (2y+1)dx + (2x)dy. Ici 3*1 + 2*0." },
+  { q: "Valeur de α.V.T pour un gaz parfait si nR=1 ?", answer: "1", hint: "α = 1/T pour un gaz parfait. Donc (1/T)*V*T = V. Si nR=1 et P=1, V=T." },
+  { q: "Si f(x,y)=x*cos(y), que vaut ∂²f/∂y∂x au point (1, 0) ?", answer: "0", hint: "∂f/∂x = cos(y). Dérivez ensuite cos(y) par rapport à y -> -sin(y). sin(0)=0." }
 ];
 
-let currentIdx=0, score=0, hasRetried=false, userLog=[], attemptNumber=1;
+let currentIdx = 0;
+let hasRetried = false;
+let score = 0;
+let studentName = '';
 
-function startMission(){
-    const nameInput = document.getElementById("studentName").value.trim();
-    if(!nameInput){ alert("Veuillez entrer votre nom"); return; }
-    window.currentStudentName = nameInput;
-    currentIdx=0; score=0; hasRetried=false; attemptNumber=1; userLog=[]; document.getElementById('inventory').innerHTML=""; renderQuestion();
+function startMission() {
+  studentName = document.getElementById('studentName').value.trim();
+  if(!studentName) { alert("Veuillez entrer votre nom pour commencer."); return; }
+  currentIdx = 0; score = 0; hasRetried = false; renderQuestion();
 }
 
-function renderQuestion(){
-    const data = questions[currentIdx];
+function renderQuestion() {
+  const data = questions[currentIdx];
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="text-center">
+      <p class="text-[10px] font-bold text-stone-400 uppercase mb-2">Énigme ${currentIdx + 1}</p>
+      <h2 class="text-xl font-mono font-bold text-[#3e2723] mb-8 p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300">${data.q}</h2>
+      <div class="flex justify-center gap-4 mb-10">
+        ${renderWheel('sign')}
+        ${renderWheel('num')}
+      </div>
+      <div class="flex flex-col gap-3">
+        <button onclick="checkCode()" class="bg-[#3e2723] text-[#faedcd] py-4 rounded-xl font-black uppercase tracking-widest shadow-lg">Tenter le Code</button>
+        <p id="retry-msg" class="text-xs text-orange-700 font-bold h-4"></p>
+      </div>
+    </div>
+  `;
+  updateUI();
+}
+
+function renderWheel(type) {
+  const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
+  return `<div class="flex flex-col items-center">
+    <button onclick="spin('${type}',1)" class="text-[#8b4513] text-xl font-bold">▲</button>
+    <div id="wheel-${type}" class="vault-wheel w-16 h-20 flex items-center justify-center text-3xl font-black text-white rounded-xl my-2 shadow-inner">${vals[0]}</div>
+    <button onclick="spin('${type}',-1)" class="text-[#8b4513] text-xl font-bold">▼</button>
+  </div>`;
+}
+
+let currentSign = '+', currentNum = '0';
+
+function spin(type, dir) {
+  const vals = type==='sign'?['+','-']:['0','1','2','3','4','5'];
+  if(type==='sign') {
+    currentSign = currentSign==='+'?'-':'+';
+    document.getElementById('wheel-sign').innerText = currentSign;
+  } else {
+    let idx = vals.indexOf(currentNum);
+    idx = (idx+dir+vals.length)%vals.length;
+    currentNum = vals[idx];
+    document.getElementById('wheel-num').innerText = currentNum;
+  }
+}
+
+function checkCode() {
+  const userAns = (currentSign==='-'?'-':'') + currentNum;
+  const finalAns = userAns.replace('+','');
+  const data = questions[currentIdx];
+  if(finalAns==data.answer) success();
+  else fail();
+}
+
+function success() {
+  score++;
+  addBadge(questions[currentIdx].answer);
+  saveAnswer(studentName, questions[currentIdx].q, questions[currentIdx].answer, true);
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="text-center py-10 animate-bounce">
+      <div class="text-6xl mb-4">🔓</div>
+      <h2 class="text-2xl font-black text-green-700">CODE ACCEPTÉ !</h2>
+      <p class="text-stone-500 mt-2 italic">Excellent, continuez !</p>
+      <button onclick="next()" class="mt-8 bg-[#3e2723] text-white px-8 py-3 rounded-lg">Suivant</button>
+    </div>
+  `;
+}
+
+function fail() {
+  const container = document.getElementById('game-zone');
+  container.classList.add('shake');
+  setTimeout(() => container.classList.remove('shake'), 400);
+  if(!hasRetried) {
+    hasRetried = true;
+    document.getElementById('retry-msg').innerText = "CODE ERRONÉ : UNE DERNIÈRE TENTATIVE !";
+  } else {
+    saveAnswer(studentName, questions[currentIdx].q, currentSign+currentNum, false);
     document.getElementById('quiz-content').innerHTML = `
-        <div class="text-center card-pop">
-            <p class="text-[10px] font-bold text-stone-400 uppercase mb-2">Verrou ${currentIdx+1}/8</p>
-            <h2 class="text-lg font-mono font-bold text-[#3e2723] mb-8 p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300 min-h-[80px] flex items-center justify-center">${data.q}</h2>
-            <input id="userAnswer" type="text" placeholder="Votre réponse" class="px-3 py-2 rounded border text-[#3e2723] font-bold text-center mb-4"/>
-            <div>
-                <button onclick="checkCode()" class="bg-[#3e2723] text-[#faedcd] py-3 rounded-xl font-black uppercase shadow-lg active:scale-95 w-36">Valider</button>
-                <p id="retry-msg" class="text-[10px] text-orange-700 font-bold h-4 uppercase mt-2"></p>
-            </div>
-        </div>
+      <div class="text-center py-10">
+        <div class="text-6xl mb-4">🚨</div>
+        <h2 class="text-2xl font-black text-red-700">COFFRE BLOQUÉ</h2>
+        <p class="text-stone-500 mt-2 px-4">La solution était ${questions[currentIdx].answer}.<br><small>${questions[currentIdx].hint}</small></p>
+        <button onclick="next()" class="mt-8 bg-stone-200 px-8 py-3 rounded-lg">Continuer</button>
+      </div>
     `;
-    updateUI();
+  }
 }
 
-function checkCode(){
-    const userAns = document.getElementById("userAnswer").value.trim();
-    const data = questions[currentIdx];
-    if(userAns === ""){ alert("Entrez une réponse"); return; }
-
-    const isCorrect = (userAns === data.answer);
-    sendToSheet(data.q, userAns, isCorrect);
-
-    if(isCorrect){
-        score++; addBadge(data.concept);
-        document.getElementById('quiz-content').innerHTML = `
-            <div class="text-center py-10 card-pop">
-                <div class="text-6xl mb-4 animate-bounce">🔓</div>
-                <h2 class="text-2xl font-black text-green-700">Excellent ! Continuez</h2>
-                <button onclick="nextQuestion()" class="mt-8 bg-[#3e2723] text-white px-10 py-3 rounded-lg font-bold">Suivant</button>
-            </div>`;
-    } else {
-        if(!hasRetried){
-            hasRetried=true; attemptNumber=2;
-            document.getElementById("retry-msg").innerText = "⚠️ Code invalide : Dernière tentative !";
-        } else {
-            document.getElementById('quiz-content').innerHTML = `
-                <div class="text-center py-10 card-pop">
-                    <div class="text-6xl mb-4">🚨</div>
-                    <h2 class="text-2xl font-black text-red-700 font-mono">Pensez-y encore !</h2>
-                    <p class="text-stone-500 italic mb-4">${data.hint}</p>
-                    <button onclick="nextQuestion()" class="mt-4 bg-stone-200 px-10 py-3 rounded-lg font-bold">Suivant</button>
-                </div>`;
-            userLog.push({q:data.q, user:userAns, correct:false, solution:data.answer, hint:data.hint, level:currentIdx+1, attempt:attemptNumber});
-        }
-    }
+function next() {
+  currentIdx++;
+  hasRetried = false;
+  currentSign = '+'; currentNum = '0';
+  if(currentIdx < questions.length) renderQuestion();
+  else renderEnd();
 }
 
-function nextQuestion(){
-    const data = questions[currentIdx];
-    if(!hasRetried) attemptNumber=1;
-    if(hasRetried && !userLog.find(u => u.q===data.q && u.attempt===2)){
-        userLog.push({q:data.q, user:document.getElementById("userAnswer")?.value||"", correct:false, solution:data.answer, hint:data.hint, level:currentIdx+1, attempt:2});
-    }
-    currentIdx++; hasRetried=false; attemptNumber=1;
-    if(currentIdx<questions.length) renderQuestion();
-    else renderEnd();
+function addBadge(val) {
+  document.getElementById('inventory').innerHTML += `<div class="h-12 w-12 rounded-full rarity-gold flex items-center justify-center font-black text-[#3e2723] border shadow-md text-xs">${val}</div>`;
 }
 
-function addBadge(conceptName){
-    const inv = document.getElementById('inventory'); const empty=document.getElementById('empty-inv'); if(empty) empty.remove();
-    inv.innerHTML+=`<div class="card-pop rarity-gold px-2 py-1 rounded flex flex-col items-center justify-center border shadow-sm min-w-[70px]">
-        <span class="text-[7px] font-black uppercase text-[#3e2723] text-center">${conceptName}</span>
-    </div>`;
+function updateUI() {
+  document.getElementById('prog-bar').style.width = (currentIdx/questions.length*100)+"%";
+  document.getElementById('score-text').innerText = `Niveau ${currentIdx}/${questions.length}`;
 }
 
-function updateUI(){
-    document.getElementById('prog-bar').style.width = (currentIdx/questions.length*100) + "%";
-    document.getElementById('score-text').innerText = `Niveau ${currentIdx}/${questions.length}`;
+function renderEnd() {
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="text-center">
+      <h2 class="text-5xl font-black text-[#3e2723]">${score}/${questions.length}</h2>
+      <p class="font-bold text-stone-400 uppercase tracking-widest text-sm">Expertise du Coffre-Fort</p>
+      <button onclick="location.reload()" class="mt-10 bg-[#3e2723] text-white px-10 py-4 rounded-xl font-bold">Réinitialiser le système</button>
+    </div>
+  `;
 }
 
-function renderEnd(){
-    document.getElementById('quiz-content').innerHTML = `
-        <div class="text-center card-pop">
-            <h2 class="text-6xl font-black text-[#3e2723]">${score}/${questions.length}</h2>
-            <p class="font-bold text-[#bc6c25] uppercase text-xs mt-2">Déchiffrement Terminé</p>
-            <div class="mt-6 text-left bg-stone-50 rounded-xl p-4 border max-h-[250px] overflow-y-auto">
-                ${userLog.map((item,i)=>`
-                    <div class="mb-3 pb-2 border-b border-stone-200 last:border-0">
-                        <p class="text-[10px] font-bold">${i+1}. ${item.q}</p>
-                        <p class="text-[9px] ${item.correct?'text-green-600':'text-red-600'}">Réponse : ${item.user} ${item.correct?'✅':'❌ (Sol: '+item.solution+')'}</p>
-                        <p class="text-[8px] italic text-stone-400">Note : ${item.hint}</p>
-                    </div>`).join('')}
-            </div>
-            <button onclick="location.reload()" class="mt-6 bg-[#3e2723] text-white px-10 py-4 rounded-xl font-bold w-full">Recommencer</button>
-        </div>`;
-}
-
-// ----- Fonction pour envoyer les réponses vers Google Sheet -----
-function sendToSheet(question, answer, correct){
-    fetch("TON_URL_GOOGLE_SCRIPT", {
-        method:"POST",
-        body: JSON.stringify({
-            name: window.currentStudentName,
-            question: question,
-            answer: answer,
-            correct: correct,
-            level: currentIdx+1,
-            attempt: attemptNumber
-        })
-    });
+// Google Sheet integration
+function saveAnswer(nom, question, reponse, correct) {
+  fetch("https://script.google.com/macros/s/TON_SCRIPT_ID/exec", {
+    method:"POST",
+    body: JSON.stringify({nom, question, reponse, correct})
+  });
 }
 </script>
 
