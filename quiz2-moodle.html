@@ -7,15 +7,60 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
-        :root { --marron: #3e2723; --beige: #f5f2e9; --or: #d4a373; --or-clair: #faedcd; }
-        body { font-family: 'Fira Code', monospace; background-color: var(--beige); color: var(--marron); margin: 0; }
-        .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--or); }
-        .vault-header { background-color: var(--marron); color: var(--or-clair); }
-        .btn-choice { background: white; border: 2px solid var(--or); transition: 0.2s; cursor: pointer; width: 100%; text-align: left; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 14px; }
+        
+        :root {
+            --marron-sombre: #3e2723;
+            --marron-moyen: #5d4037;
+            --beige: #f5f2e9;
+            --or: #d4a373;
+            --or-clair: #faedcd;
+        }
+
+        body { 
+            font-family: 'Fira Code', monospace; 
+            background-color: var(--beige); 
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            color: var(--marron-sombre);
+            margin: 0; padding: 0;
+        }
+
+        .vault-header { background-color: var(--marron-sombre); color: var(--or-clair); }
+        
+        .btn-choice { 
+            background: white; border: 2px solid var(--or); 
+            color: var(--marron-sombre); cursor: pointer;
+            width: 100%; text-align: left; padding: 15px; border-radius: 10px;
+            font-weight: bold; transition: background 0.2s;
+        }
         .btn-choice:hover { background: var(--or-clair); }
+
+        .btn-action { 
+            background-color: var(--marron-sombre); color: var(--or-clair); 
+            cursor: pointer;
+        }
+
         #timer-bar { height: 100%; background-color: #a44a3f; width: 100%; transition: width 1s linear; }
-        .correction-card { background: white; border-left: 5px solid var(--marron); padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .card-static { opacity: 0; animation: fadeIn 0.4s forwards; }
+
+        /* Style des Badges / Cartes */
+        .badge-card {
+            background: white;
+            border: 2px solid var(--or);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px var(--or);
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .correction-card { 
+            background: white; border-left: 5px solid var(--marron-sombre); 
+            padding: 15px; margin-bottom: 12px; border-radius: 5px;
+        }
+
+        .fade-in { animation: fadeIn 0.4s forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
@@ -23,11 +68,11 @@
 
     <header class="vault-header p-4 shadow-lg border-b-4 border-[#bc6c25] flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-black uppercase">Mission : Labyrinthe</h1>
-            <p class="text-[10px] text-[#d4a373] font-bold">ANTI-TRICHE | AXE 1</p>
+            <h1 class="text-lg font-black uppercase tracking-tight">Thermodynamique S1</h1>
+            <p class="text-[10px] text-[#d4a373] font-bold uppercase italic">Axe 1 : Outils Mathématiques</p>
         </div>
         <div class="text-right border-l border-[#d4a373] pl-4">
-            <span id="studentDisplay" class="text-sm font-bold block uppercase text-white">IDENTIFICATION</span>
+            <span id="studentDisplay" class="text-sm font-bold block uppercase text-white">Identification...</span>
         </div>
     </header>
 
@@ -37,37 +82,44 @@
             <div class="w-full bg-stone-300 h-2 rounded-full mb-4 overflow-hidden border border-stone-400">
                 <div id="timer-bar"></div>
             </div>
-            <div class="flex justify-between mb-6 font-bold text-xs uppercase">
-                <div class="glass px-4 py-2 rounded">Salle: <span id="room-num">1</span></div>
-                <div class="glass px-4 py-2 rounded">Temps: <span id="timer-text">20s</span></div>
-                <div class="glass px-4 py-2 rounded">Vies: <span id="lives-text">2/2</span></div>
+            <div class="flex justify-between mb-6 text-[10px] font-bold uppercase">
+                <div class="glass px-3 py-1 rounded">Salle: <span id="room-num">1</span></div>
+                <div class="glass px-3 py-1 rounded">Temps: <span id="timer-text">20s</span></div>
+                <div class="glass px-3 py-1 rounded">Vies: <span id="lives-text">2/2</span></div>
             </div>
         </div>
 
-        <section id="game-container" class="bg-white rounded-xl shadow-xl p-8 min-h-[450px] flex items-center justify-center border border-stone-300">
+        <section id="game-container" class="bg-white rounded-xl shadow-xl p-8 min-h-[400px] flex items-center justify-center border border-stone-300">
             <div id="game-box" class="w-full">
-                <div class="text-center card-static">
+                <div class="text-center fade-in">
                     <div class="text-5xl mb-6">🔐</div>
                     <h2 class="text-2xl font-black mb-6 uppercase">Accès Étudiant</h2>
-                    <input id="studentName" type="text" placeholder="NOM ET PRÉNOM" class="w-full max-w-sm p-4 border-2 border-stone-300 rounded-lg mb-4 text-center font-bold uppercase outline-none focus:border-stone-600">
-                    <button onclick="startMission()" class="bg-[#3e2723] text-[#faedcd] w-full max-w-sm py-4 rounded-lg font-black">ENTRER DANS LE LABYRINTHE</button>
+                    <input id="studentName" type="text" placeholder="NOM ET PRÉNOM" 
+                        class="w-full max-w-sm p-4 border-2 border-stone-300 rounded-lg mb-4 text-center font-bold uppercase outline-none focus:border-stone-500">
+                    <button onclick="startMission()" class="btn-action w-full max-w-sm py-4 rounded-lg font-black text-lg">OUVRIR LE LABYRINTHE</button>
                 </div>
             </div>
         </section>
+
+        <div id="inventory-box" class="mt-8 hidden">
+            <h3 class="text-[10px] font-black text-stone-500 uppercase border-b border-stone-300 mb-3 pb-1 tracking-widest">📦 Cartes de compétences gagnées</h3>
+            <div id="badge-container" class="flex flex-wrap gap-2">
+                </div>
+        </div>
     </main>
 
     <script>
-        const SHEET_URL = "https://script.google.com/macros/s/AKfycbzypFRivN9KE24e00egfrAVyVhNrSa9bavGNskaf3UIxKn9KntlEqtUh-NfpQDDa3LI/exec";
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbwAj5NM9w1EgI-kBT-OEYT__GxlbSUDqZKFC1aIEE6rJ5jPe0Uxx5BZCDd5KB9hrcI-hQ/exec";
 
         const database = [
-            { id: 1, q: "∂f/∂x pour f(x,y) = 2x² + y³", options: ["4x", "2x", "4x + 3y²"], correct: "4x", exp: "On dérive x. y³ est constante (0). La dérivée de 2x² est 4x." },
-            { id: 2, q: "∂f/∂y pour f(x,y) = x²/y + y²/x", options: ["-x²/y² + 2y/x", "x/y² + 2y", "2x/y - y/x²"], correct: "-x²/y² + 2y/x", exp: "Dérivée de 1/y est -1/y² et dérivée de y² est 2y." },
-            { id: 3, q: "df pour f = x³y en (1,1) avec dx=1, dy=0", options: ["3", "1", "0"], correct: "3", exp: "df = (3x²y)dx + (x³)dy. En (1,1) avec dy=0: 3*1*1 = 3." },
-            { id: 4, q: "Schwartz : ∂²f/∂y∂x de f(x,y) = 2xy + x", options: ["2", "1", "2x"], correct: "2", exp: "∂f/∂x = 2y+1. La dérivée de (2y+1) par rapport à y est 2." },
-            { id: 5, q: "Gaz parfait : valeur du coefficient α ?", options: ["1/T", "1/P", "-1/V"], correct: "1/T", exp: "α = (1/V)(∂V/∂T)p. Pour PV=nRT, α = 1/T." },
-            { id: 6, q: "Unité du coefficient χT ?", options: ["Pa⁻¹", "K⁻¹", "Pascal"], correct: "Pa⁻¹", exp: "χT est lié à l'inverse de la pression, donc Pa⁻¹." },
-            { id: 7, q: "Relation Triple : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p = ?", options: ["-1", "0", "1"], correct: "-1", exp: "C'est la relation cyclique fondamentale entre variables d'état." },
-            { id: 8, q: "∂²f/∂x² pour f(x,y) = 2x² + y³", options: ["4", "2", "4x"], correct: "4", exp: "∂f/∂x = 4x. La dérivée de 4x est 4." }
+            { q: "Calculer ∂f/∂x pour f(x,y) = 2x² + y³", options: ["4x", "2x", "4x + 3y²"], correct: "4x", concept: "Dérivée Simple", exp: "On dérive par rapport à x : y³ est une constante. La dérivée de 2x² est 4x." },
+            { q: "Pour f(x,y) = x²/y + y²/x, calculez ∂f/∂y", options: ["-x²/y² + 2y/x", "x/y² + 2y", "2x/y - y/x²"], correct: "-x²/y² + 2y/x", concept: "Variable Inverse", exp: "Dérivée de 1/y est -1/y², et dérivée de y² est 2y." },
+            { q: "df pour f = x³y en (1,1) avec dx=1, dy=0", options: ["3", "1", "0"], correct: "3", concept: "Différentielle", exp: "df = (3x²y)dx + (x³)dy. Avec dy=0 et x,y=1, on obtient 3." },
+            { q: "Schwartz : ∂²f/∂y∂x de f(x,y) = 2xy + x", options: ["2", "1", "2x"], correct: "2", concept: "Critère Schwartz", exp: "∂f/∂x = 2y+1. Dériver cela par rapport à y donne 2." },
+            { q: "Gaz parfait : valeur du coefficient α ?", options: ["1/T", "1/P", "-1/V"], correct: "1/T", concept: "Coeff Dilatation", exp: "α = (1/V)(∂V/∂T)p. Pour un gaz parfait, α = 1/T." },
+            { q: "Unité du coefficient χT ?", options: ["Pa⁻¹", "K⁻¹", "Pascal"], correct: "Pa⁻¹", concept: "Unités SI", exp: "L'unité est l'inverse de la pression (Pascal⁻¹)." },
+            { q: "Relation Triple : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p = ?", options: ["-1", "0", "1"], correct: "-1", concept: "Rel. Cyclique", exp: "C'est une identité fondamentale qui vaut toujours -1." },
+            { q: "∂²f/∂x² pour f(x,y) = 2x² + y³", options: ["4", "2", "4x"], correct: "4", concept: "Dérivée Ordre 2", exp: "∂f/∂x = 4x. En dérivant encore par x, on obtient 4." }
         ];
 
         let currentIdx = 0, lives = 2, timer, timeLeft = 20, studentName = "", score = 0;
@@ -76,17 +128,18 @@
 
         function startMission() {
             const name = document.getElementById("studentName").value.trim();
-            if(!name) return alert("Nom requis");
+            if(!name) return;
             studentName = name;
             document.getElementById("studentDisplay").innerText = studentName;
             document.getElementById("ui-header").classList.remove("hidden");
+            document.getElementById("inventory-box").classList.remove("hidden");
             showQuestion();
         }
 
         function startTimer() {
             clearInterval(timer); timeLeft = 20;
             timer = setInterval(() => {
-                timeLeft--; 
+                timeLeft--;
                 document.getElementById("timer-text").innerText = timeLeft + "s";
                 document.getElementById("timer-bar").style.width = (timeLeft / 20 * 100) + "%";
                 if(timeLeft <= 0) handleAnswer("TEMPS ÉCOULÉ");
@@ -101,9 +154,10 @@
             document.getElementById("room-num").innerText = currentIdx + 1;
             document.getElementById("lives-text").innerText = lives + "/2";
             document.getElementById("game-box").innerHTML = `
-                <div class="card-static">
-                    <h2 class="text-xl font-bold text-center mb-8">${d.q}</h2>
-                    <div class="space-y-3 max-w-sm mx-auto">
+                <div class="fade-in">
+                    <p class="text-center text-[#bc6c25] text-[8px] font-black uppercase mb-2 tracking-widest">${d.concept}</p>
+                    <h2 class="text-lg font-bold text-center mb-8 min-h-[60px] flex items-center justify-center">${d.q}</h2>
+                    <div class="grid gap-3 max-w-sm mx-auto">
                         ${shuffledOptions.map(opt => `<button onclick="handleAnswer('${opt}')" class="btn-choice">${opt}</button>`).join('')}
                     </div>
                 </div>`;
@@ -114,11 +168,15 @@
             clearInterval(timer);
             const d = database[currentIdx];
             const isCorrect = choice === d.correct;
+
             saveData(studentName, d.q, choice, isCorrect);
 
             if(isCorrect) {
-                score++; currentIdx++; lives = 2;
-                renderFeedback(true, "RÉPONSE VALIDÉE");
+                score++;
+                addBadge(d.concept);
+                currentIdx++;
+                lives = 2;
+                renderFeedback(true, "CODE ACCEPTÉ");
             } else {
                 lives--;
                 if(lives > 0) renderFeedback(false, "ERREUR ! UNE CHANCE RESTANTE");
@@ -128,36 +186,43 @@
 
         function renderFeedback(success, title) {
             document.getElementById("game-box").innerHTML = `
-                <div class="text-center card-static">
-                    <div class="text-5xl mb-4">${success ? '✅' : '❌'}</div>
+                <div class="text-center fade-in">
+                    <div class="text-5xl mb-4">${success ? '✨' : '❌'}</div>
                     <h2 class="text-xl font-bold mb-8 ${success ? 'text-green-700' : 'text-red-700'}">${title}</h2>
-                    <button onclick="showQuestion()" class="bg-[#3e2723] text-white px-12 py-3 rounded-lg font-bold">CONTINUER</button>
+                    <button onclick="showQuestion()" class="btn-action px-12 py-3 rounded-lg font-bold">CONTINUER</button>
                 </div>`;
+        }
+
+        function addBadge(concept) {
+            const container = document.getElementById("badge-container");
+            const badgeId = `badge-${concept.replace(/\s+/g, '')}`;
+            if (!document.getElementById(badgeId)) {
+                container.innerHTML += `<div id="${badgeId}" class="badge-card">🎴 ${concept}</div>`;
+            }
         }
 
         function renderEnd() {
             document.getElementById("ui-header").classList.add("hidden");
             document.getElementById("game-box").innerHTML = `
-                <div class="card-static text-center">
-                    <div class="text-6xl mb-4">🏆</div>
-                    <h2 class="text-2xl font-black mb-2 uppercase">MISSION TERMINÉE</h2>
-                    <p class="text-xl font-bold text-green-700 mb-8">SCORE : ${score} / 8</p>
-                    <div class="text-left space-y-4 max-h-[400px] overflow-y-auto px-2">
-                        <h3 class="font-black text-sm border-b pb-2 uppercase text-stone-500">Rapport de Correction :</h3>
+                <div class="fade-in text-center">
+                    <div class="text-5xl mb-4">🏆</div>
+                    <h2 class="text-2xl font-black mb-2 uppercase">Labyrinthe Maîtrisé</h2>
+                    <p class="text-lg font-bold text-green-700 mb-6">SCORE FINAL : ${score} / 8</p>
+                    <div class="text-left space-y-4 max-h-[350px] overflow-y-auto pr-2 border-t pt-4">
                         ${database.map((d, i) => `
                             <div class="correction-card">
                                 <p class="font-bold text-sm">${i+1}. ${d.q}</p>
-                                <p class="text-green-600 font-bold text-xs">Solution : ${d.correct}</p>
-                                <p class="text-stone-500 text-[11px] mt-2 italic"><strong>Explication :</strong> ${d.exp}</p>
+                                <p class="text-green-600 font-bold text-xs mt-1">✓ Solution : ${d.correct}</p>
+                                <p class="text-stone-500 text-[10px] mt-2 italic leading-relaxed"><strong>Explication :</strong> ${d.exp}</p>
                             </div>
                         `).join('')}
                     </div>
-                    <button onclick="location.reload()" class="mt-8 bg-[#3e2723] text-white px-10 py-4 rounded-lg font-bold w-full">RECOMMENCER</button>
+                    <button onclick="location.reload()" class="btn-action px-10 py-4 rounded-lg font-bold w-full mt-6 shadow-lg">RECOMMENCER</button>
                 </div>`;
         }
 
         function saveData(nom, question, reponse, correct) {
-            fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type":"application/json" }, body: JSON.stringify({ nom, question, reponse, correct }) });
+            fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nom, question, reponse, correct }) });
         }
     </script>
 </body>
