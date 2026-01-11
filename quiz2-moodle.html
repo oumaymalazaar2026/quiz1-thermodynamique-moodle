@@ -176,11 +176,11 @@
                 addBadge(d.concept);
                 currentIdx++;
                 lives = 2;
-                renderFeedback(true, "CODE ACCEPTÉ");
+                renderFeedback(true, "VOTRE RÉPONSE EST CORRECTE !");
             } else {
                 lives--;
                 if(lives > 0) renderFeedback(false, "ERREUR ! UNE CHANCE RESTANTE");
-                else { currentIdx = Math.max(0, currentIdx - 1); lives = 2; renderFeedback(false, "SÉCURITÉ : RECUL D'UNE SALLE"); }
+                else { currentIdx = Math.max(0, currentIdx - 2); lives = 2; renderFeedback(false, "SÉCURITÉ : RECUL DE 2 SALLES !"); }
             }
         }
 
