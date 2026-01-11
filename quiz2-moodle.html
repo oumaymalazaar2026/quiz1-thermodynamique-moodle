@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labyrinthe Thermo - Axe 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+        
+        :root {
+            --marron-sombre: #3e2723;
+            --marron-moyen: #5d4037;
+            --beige: #f5f2e9;
+            --or: #d4a373;
+            --or-clair: #faedcd;
+        }
+
+        body { 
+            font-family: 'Fira Code', monospace; 
+            background-color: var(--beige); 
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            color: var(--marron-sombre);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Interface Fixe et Stable */
+        .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--or); }
+        .vault-header { background-color: var(--marron-sombre); color: var(--or-clair); }
+        
+        .btn-choice { 
+            background: white; 
+            border: 2px solid var(--or); 
+            color: var(--marron-sombre);
+            transition: background 0.2s; 
+            cursor: pointer;
+        }
+        .btn-choice:hover { background: var(--or-clair); }
+
+        .btn-action {
+            background-color: var(--marron-sombre);
+            color: var(--or-clair);
+            cursor: pointer;
+        }
+
+        #timer-bar { 
+            height: 100%;
+            background-color: #a44a3f;
+            width: 100%;
+            transition: width 1s linear;
+        }
+
+        /* Suppression des animations de mouvement */
+        .no-move { transform: none !important; animation: none !important; }
+        
+        .card-static {
+            opacity: 0;
+            animation: fadeIn 0.4s forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="vault-header p-4 shadow-lg border-b-4 border-[#bc6c25] flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-black uppercase tracking-tight">Mission : Labyrinthe</h1>
+            <p class="text-[10px] text-[#d4a373] font-bold">AXE 1 : OUTILS MATHÉMATIQUES</p>
+        </div>
+        <div class="text-right border-l border-[#d4a373] pl-4">
+            <span id="studentDisplay" class="text-sm font-bold block uppercase text-white italic">IDENTIFICATION...</span>
+        </div>
+    </header>
+
+    <main class="p-6 max-w-3xl mx-auto w-full flex-grow">
+        
+        <div id="ui-header" class="hidden">
+            <div class="w-full bg-stone-300 h-3 rounded-full mb-4 border border-stone-400 overflow-hidden">
+                <div id="timer-bar"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="glass p-2 rounded text-center"><span class="block text-[8px] uppercase font-bold">Salle</span><span id="room-num" class="font-bold">1</span></div>
+                <div class="glass p-2 rounded text-center"><span class="block text-[8px] uppercase font-bold">Temps</span><span id="timer-text" class="font-bold">20s</span></div>
+                <div class="glass p-2 rounded text-center"><span class="block text-[8px] uppercase font-bold">Vies</span><span id="lives-text" class="font-bold text-red-700">2/2</span></div>
+            </div>
+        </div>
+
+        <section id="game-container" class="bg-white rounded-xl shadow-xl p-8 min-h-[400px] flex items-center justify-center border border-stone-300">
+            <div id="game-box" class="w-full">
+                <div class="text-center card-static">
+                    <div class="text-5xl mb-6">🗝️</div>
+                    <h2 class="text-2xl font-black mb-6 uppercase">Accès au Labyrinthe</h2>
+                    <input id="studentName" type="text" placeholder="ENTREZ VOTRE NOM ET PRÉNOM" 
+                        class="w-full max-w-sm p-4 border-2 border-stone-300 rounded-lg mb-4 text-center font-bold uppercase outline-none focus:border-stone-500">
+                    <p id="nameError" class="text-red-600 text-xs hidden mb-4 font-bold">LE NOM EST OBLIGATOIRE POUR ENREGISTRER VOS RÉSULTATS.</p>
+                    <button onclick="startMission()" class="btn-action w-full max-w-sm py-4 rounded-lg font-black text-lg">DÉMARRER LA SÉQUENCE</button>
+                </div>
+            </div>
+        </section>
+
+        <div id="inventory-box" class="mt-8 hidden">
+            <p class="text-[10px] font-black text-stone-500 uppercase border-b border-stone-300 mb-4 pb-1">Cartes de compétence acquises</p>
+            <div id="inventory-grid" class="flex flex-wrap gap-2"></div>
+        </div>
+    </main>
+
+    <script>
+        // LIEN GOOGLE SHEETS (Assurez-vous qu'il est correct)
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbwB98ctML7fO6_SZ83fbT0vbXPgqj6x7wu5gQrbQoyIzc2hk-AtQyyoNNCunlF-EZPu/exec";
+
+        const database = [
+            { q: "Calculer ∂f/∂x pour f(x,y) = 2x² + y³", options: ["4x", "2x", "4x + 3y²"], correct: "4x", concept: "Dérivée Simple" },
+            { q: "Pour f(x,y) = x²/y + y²/x, calculez ∂f/∂y", options: ["x/y² + 2y", "-x²/y² + 2y/x", "2x/y - y/x²"], correct: "-x²/y² + 2y/x", concept: "Variable Inverse" },
+            { q: "df pour f = x³y au point (1,1) avec dx=1, dy=0", options: ["1", "3", "0"], correct: "3", concept: "Différentielle" },
+            { q: "Critère de Schwartz : ∂²f/∂y∂x de f(x,y) = 2xy + x", options: ["1", "2", "2x"], correct: "2", concept: "Schwartz" },
+            { q: "Gaz parfait : quelle est la valeur de α ?", options: ["1/P", "1/T", "-1/V"], correct: "1/T", concept: "Coeff Dilatation" },
+            { q: "Unité du coefficient de compressibilité χT ?", options: ["K⁻¹", "Pascal", "Pa⁻¹"], correct: "Pa⁻¹", concept: "Unités SI" },
+            { q: "Relation Triple : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p = ?", options: ["0", "1", "-1"], correct: "-1", concept: "Relation Cyclique" },
+            { q: "∂²f/∂x² pour f(x,y) = 2x² + y³", options: ["2", "4", "4x"], correct: "4", concept: "Ordre 2" }
+        ];
+
+        let currentIdx = 0, lives = 2, timer, timeLeft = 20, studentName = "";
+
+        function startMission() {
+            const name = document.getElementById("studentName").value.trim();
+            if(!name) {
+                document.getElementById("nameError").classList.remove("hidden");
+                return;
+            }
+            studentName = name;
+            document.getElementById("studentDisplay").innerText = studentName;
+            document.getElementById("ui-header").classList.remove("hidden");
+            document.getElementById("inventory-box").classList.remove("hidden");
+            showQuestion();
+        }
+
+        function startTimer() {
+            clearInterval(timer);
+            timeLeft = 20;
+            updateTimerUI();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if(timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleAnswer("TEMPS ÉCOULÉ");
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            document.getElementById("timer-text").innerText = timeLeft + "s";
+            document.getElementById("timer-bar").style.width = (timeLeft / 20 * 100) + "%";
+        }
+
+        function showQuestion() {
+            if(currentIdx >= database.length) { renderEnd(); return; }
+            
+            const d = database[currentIdx];
+            document.getElementById("room-num").innerText = currentIdx + 1;
+            document.getElementById("lives-text").innerText = lives + "/2";
+
+            document.getElementById("game-box").innerHTML = `
+                <div class="card-static">
+                    <p class="text-center text-[#bc6c25] text-[10px] font-black uppercase mb-2 tracking-widest">${d.concept}</p>
+                    <h2 class="text-xl font-bold text-center mb-8 min-h-[50px] flex items-center justify-center">${d.q}</h2>
+                    <div class="grid gap-3 max-w-sm mx-auto">
+                        ${d.options.map(opt => `
+                            <button onclick="handleAnswer('${opt}')" class="btn-choice p-4 rounded-lg font-bold text-sm">${opt}</button>
+                        `).join('')}
+                    </div>
+                </div>`;
+            startTimer();
+        }
+
+        function handleAnswer(choice) {
+            clearInterval(timer);
+            const d = database[currentIdx];
+            const isCorrect = choice === d.correct;
+
+            // Envoi immédiat vers Google Sheets
+            saveData(studentName, d.q, choice, isCorrect);
+
+            if(isCorrect) {
+                currentIdx++;
+                lives = 2; // Réinitialise les vies
+                addBadge(d.concept);
+                renderFeedback(true, "RÉPONSE VALIDÉE");
+            } else {
+                lives--;
+                if(lives > 0) {
+                    renderFeedback(false, choice === "TEMPS ÉCOULÉ" ? "TEMPS ÉCOULÉ ! REESSAYEZ" : "MAUVAISE RÉPONSE ! REESSAYEZ");
+                } else {
+                    currentIdx = Math.max(0, currentIdx - 1); // Recul
+                    lives = 2;
+                    renderFeedback(false, "SÉCURITÉ ACTIVÉE : RECUL D'UNE SALLE");
+                }
+            }
+        }
+
+        function renderFeedback(success, title) {
+            document.getElementById("game-box").innerHTML = `
+                <div class="text-center card-static">
+                    <div class="text-5xl mb-4">${success ? '✨' : '❌'}</div>
+                    <h2 class="text-xl font-bold mb-8 ${success ? 'text-green-700' : 'text-red-700'}">${title}</h2>
+                    <button onclick="showQuestion()" class="btn-action px-12 py-3 rounded-lg font-bold">CONTINUER</button>
+                </div>`;
+        }
+
+        function addBadge(concept) {
+            const grid = document.getElementById("inventory-grid");
+            const id = `b-${concept.replace(/\s+/g, '')}`;
+            if(!document.getElementById(id)) {
+                grid.innerHTML += `<div id="${id}" class="bg-white border-2 border-[#d4a373] px-3 py-1 rounded text-[8px] font-bold uppercase">${concept}</div>`;
+            }
+        }
+
+        function renderEnd() {
+            document.getElementById("game-box").innerHTML = `
+                <div class="text-center card-static">
+                    <div class="text-6xl mb-4">🏆</div>
+                    <h2 class="text-2xl font-black mb-2 uppercase">Labyrinthe Terminé</h2>
+                    <p class="text-stone-500 text-sm mb-6 font-bold uppercase italic">${studentName}</p>
+                    <p class="text-sm text-stone-400 mb-8">Vos résultats ont été transmis avec succès.</p>
+                    <button onclick="location.reload()" class="btn-action px-12 py-4 rounded-lg font-bold w-full">REFAIRE L'AXE 1</button>
+                </div>`;
+        }
+
+        function saveData(nom, question, reponse, correct) {
+            fetch(SHEET_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nom, question, reponse, correct })
+            });
+        }
+    </script>
+</body>
+</html>
