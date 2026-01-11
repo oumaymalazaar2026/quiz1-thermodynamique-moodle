@@ -21,44 +21,26 @@
             background-color: var(--beige); 
             background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
             color: var(--marron-sombre);
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
         }
 
-        /* Interface Fixe et Stable */
         .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid var(--or); }
         .vault-header { background-color: var(--marron-sombre); color: var(--or-clair); }
         
         .btn-choice { 
-            background: white; 
-            border: 2px solid var(--or); 
-            color: var(--marron-sombre);
-            transition: background 0.2s; 
-            cursor: pointer;
+            background: white; border: 2px solid var(--or); 
+            color: var(--marron-sombre); transition: background 0.2s; cursor: pointer;
         }
         .btn-choice:hover { background: var(--or-clair); }
 
-        .btn-action {
-            background-color: var(--marron-sombre);
-            color: var(--or-clair);
-            cursor: pointer;
-        }
+        .btn-action { background-color: var(--marron-sombre); color: var(--or-clair); cursor: pointer; }
 
-        #timer-bar { 
-            height: 100%;
-            background-color: #a44a3f;
-            width: 100%;
-            transition: width 1s linear;
-        }
+        #timer-bar { height: 100%; background-color: #a44a3f; width: 100%; transition: width 1s linear; }
 
-        /* Suppression des animations de mouvement */
-        .no-move { transform: none !important; animation: none !important; }
-        
-        .card-static {
-            opacity: 0;
-            animation: fadeIn 0.4s forwards;
-        }
+        .card-static { opacity: 0; animation: fadeIn 0.4s forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .correction-box { background: #fff; border-left: 4px solid var(--marron-sombre); padding: 10px; margin-bottom: 10px; text-align: left; font-size: 12px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -86,48 +68,52 @@
             </div>
         </div>
 
-        <section id="game-container" class="bg-white rounded-xl shadow-xl p-8 min-h-[400px] flex items-center justify-center border border-stone-300">
+        <section id="game-container" class="bg-white rounded-xl shadow-xl p-8 min-h-[450px] flex items-center justify-center border border-stone-300">
             <div id="game-box" class="w-full">
                 <div class="text-center card-static">
                     <div class="text-5xl mb-6">🗝️</div>
                     <h2 class="text-2xl font-black mb-6 uppercase">Accès au Labyrinthe</h2>
                     <input id="studentName" type="text" placeholder="ENTREZ VOTRE NOM ET PRÉNOM" 
                         class="w-full max-w-sm p-4 border-2 border-stone-300 rounded-lg mb-4 text-center font-bold uppercase outline-none focus:border-stone-500">
-                    <p id="nameError" class="text-red-600 text-xs hidden mb-4 font-bold">LE NOM EST OBLIGATOIRE POUR ENREGISTRER VOS RÉSULTATS.</p>
-                    <button onclick="startMission()" class="btn-action w-full max-w-sm py-4 rounded-lg font-black text-lg">DÉMARRER LA SÉQUENCE</button>
+                    <p id="nameError" class="text-red-600 text-xs hidden mb-4 font-bold">LE NOM EST OBLIGATOIRE.</p>
+                    <button onclick="startMission()" class="btn-action w-full max-w-sm py-4 rounded-lg font-black text-lg">DÉMARRER</button>
                 </div>
             </div>
         </section>
 
         <div id="inventory-box" class="mt-8 hidden">
-            <p class="text-[10px] font-black text-stone-500 uppercase border-b border-stone-300 mb-4 pb-1">Cartes de compétence acquises</p>
+            <p class="text-[10px] font-black text-stone-500 uppercase border-b border-stone-300 mb-4 pb-1">Compétences</p>
             <div id="inventory-grid" class="flex flex-wrap gap-2"></div>
         </div>
     </main>
 
     <script>
-        // LIEN GOOGLE SHEETS (Assurez-vous qu'il est correct)
-        const SHEET_URL = "https://script.google.com/macros/s/AKfycbwB98ctML7fO6_SZ83fbT0vbXPgqj6x7wu5gQrbQoyIzc2hk-AtQyyoNNCunlF-EZPu/exec";
+        const SHEET_URL = "https://script.google.com/macros/s/AKfycbyUcnq4xNj_kHbzXkmT9rwq42yCjt0Pgplndh0nVE3jHiD1oIhMumqpGkGBNx4oFJpf_w/exec";
 
         const database = [
-            { q: "Calculer ∂f/∂x pour f(x,y) = 2x² + y³", options: ["4x", "2x", "4x + 3y²"], correct: "4x", concept: "Dérivée Simple" },
-            { q: "Pour f(x,y) = x²/y + y²/x, calculez ∂f/∂y", options: ["x/y² + 2y", "-x²/y² + 2y/x", "2x/y - y/x²"], correct: "-x²/y² + 2y/x", concept: "Variable Inverse" },
-            { q: "df pour f = x³y au point (1,1) avec dx=1, dy=0", options: ["1", "3", "0"], correct: "3", concept: "Différentielle" },
-            { q: "Critère de Schwartz : ∂²f/∂y∂x de f(x,y) = 2xy + x", options: ["1", "2", "2x"], correct: "2", concept: "Schwartz" },
-            { q: "Gaz parfait : quelle est la valeur de α ?", options: ["1/P", "1/T", "-1/V"], correct: "1/T", concept: "Coeff Dilatation" },
-            { q: "Unité du coefficient de compressibilité χT ?", options: ["K⁻¹", "Pascal", "Pa⁻¹"], correct: "Pa⁻¹", concept: "Unités SI" },
-            { q: "Relation Triple : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p = ?", options: ["0", "1", "-1"], correct: "-1", concept: "Relation Cyclique" },
-            { q: "∂²f/∂x² pour f(x,y) = 2x² + y³", options: ["2", "4", "4x"], correct: "4", concept: "Ordre 2" }
+            { q: "Calculer ∂f/∂x pour f(x,y) = 2x² + y³", options: ["4x", "2x", "4x + 3y²"], correct: "4x", concept: "Dérivée Simple", 
+              exp: "On dérive par rapport à x. Le terme y³ est considéré comme une constante, sa dérivée est donc 0. La dérivée de 2x² est 2 * 2x = 4x." },
+            { q: "Pour f(x,y) = x²/y + y²/x, calculez ∂f/∂y", options: ["x/y² + 2y", "-x²/y² + 2y/x", "2x/y - y/x²"], correct: "-x²/y² + 2y/x", concept: "Variable Inverse",
+              exp: "Pour le 1er terme (x²/y), la dérivée de 1/y est -1/y², donc -x²/y². Pour le 2ème terme (y²/x), la dérivée de y² est 2y, donc 2y/x." },
+            { q: "df pour f = x³y au point (1,1) avec dx=1, dy=0", options: ["1", "3", "0"], correct: "3", concept: "Différentielle",
+              exp: "df = (∂f/∂x)dx + (∂f/∂y)dy. Ici ∂f/dx = 3x²y. Au point (1,1), cela vaut 3. Puisque dy=0, df = 3 * 1 = 3." },
+            { q: "Critère de Schwartz : ∂²f/∂y∂x de f(x,y) = 2xy + x", options: ["1", "2", "2x"], correct: "2", concept: "Schwartz",
+              exp: "D'abord ∂f/∂x = 2y + 1. Ensuite, on dérive ce résultat par rapport à y : ∂/∂y(2y + 1) = 2." },
+            { q: "Gaz parfait : quelle est la valeur de α ?", options: ["1/P", "1/T", "-1/V"], correct: "1/T", concept: "Coeff Dilatation",
+              exp: "α = (1/V)(∂V/∂T)p. Pour un gaz parfait V = nRT/P, donc (∂V/∂T)p = nR/P. En remplaçant, α = (1/V)(nR/P) = (1/V)(V/T) = 1/T." },
+            { q: "Unité du coefficient de compressibilité χT ?", options: ["K⁻¹", "Pascal", "Pa⁻¹"], correct: "Pa⁻¹", concept: "Unités SI",
+              exp: "χT = -1/V (∂V/∂P)T. Puisque c'est lié à la variation de pression au dénominateur, l'unité est l'inverse d'une pression : Pa⁻¹." },
+            { q: "Relation Triple : (∂T/∂P)v (∂P/∂V)t (∂V/∂T)p = ?", options: ["0", "1", "-1"], correct: "-1", concept: "Relation Cyclique",
+              exp: "C'est une identité mathématique fondamentale pour les fonctions d'état reliées f(P,V,T)=0. Le produit des dérivées partielles cycliques vaut toujours -1." },
+            { q: "∂²f/∂x² pour f(x,y) = 2x² + y³", options: ["2", "4", "4x"], correct: "4", concept: "Ordre 2",
+              exp: "La dérivée première ∂f/∂x est 4x. En dérivant une seconde fois par rapport à x, on obtient 4." }
         ];
 
         let currentIdx = 0, lives = 2, timer, timeLeft = 20, studentName = "";
 
         function startMission() {
             const name = document.getElementById("studentName").value.trim();
-            if(!name) {
-                document.getElementById("nameError").classList.remove("hidden");
-                return;
-            }
+            if(!name) { document.getElementById("nameError").classList.remove("hidden"); return; }
             studentName = name;
             document.getElementById("studentDisplay").innerText = studentName;
             document.getElementById("ui-header").classList.remove("hidden");
@@ -136,16 +122,10 @@
         }
 
         function startTimer() {
-            clearInterval(timer);
-            timeLeft = 20;
-            updateTimerUI();
+            clearInterval(timer); timeLeft = 20; updateTimerUI();
             timer = setInterval(() => {
-                timeLeft--;
-                updateTimerUI();
-                if(timeLeft <= 0) {
-                    clearInterval(timer);
-                    handleAnswer("TEMPS ÉCOULÉ");
-                }
+                timeLeft--; updateTimerUI();
+                if(timeLeft <= 0) { clearInterval(timer); handleAnswer("TEMPS ÉCOULÉ"); }
             }, 1000);
         }
 
@@ -156,19 +136,15 @@
 
         function showQuestion() {
             if(currentIdx >= database.length) { renderEnd(); return; }
-            
             const d = database[currentIdx];
             document.getElementById("room-num").innerText = currentIdx + 1;
             document.getElementById("lives-text").innerText = lives + "/2";
-
             document.getElementById("game-box").innerHTML = `
                 <div class="card-static">
-                    <p class="text-center text-[#bc6c25] text-[10px] font-black uppercase mb-2 tracking-widest">${d.concept}</p>
+                    <p class="text-center text-[#bc6c25] text-[10px] font-black uppercase mb-2">${d.concept}</p>
                     <h2 class="text-xl font-bold text-center mb-8 min-h-[50px] flex items-center justify-center">${d.q}</h2>
                     <div class="grid gap-3 max-w-sm mx-auto">
-                        ${d.options.map(opt => `
-                            <button onclick="handleAnswer('${opt}')" class="btn-choice p-4 rounded-lg font-bold text-sm">${opt}</button>
-                        `).join('')}
+                        ${d.options.map(opt => `<button onclick="handleAnswer('${opt}')" class="btn-choice p-4 rounded-lg font-bold text-sm">${opt}</button>`).join('')}
                     </div>
                 </div>`;
             startTimer();
@@ -178,24 +154,14 @@
             clearInterval(timer);
             const d = database[currentIdx];
             const isCorrect = choice === d.correct;
-
-            // Envoi immédiat vers Google Sheets
             saveData(studentName, d.q, choice, isCorrect);
-
             if(isCorrect) {
-                currentIdx++;
-                lives = 2; // Réinitialise les vies
-                addBadge(d.concept);
+                currentIdx++; lives = 2; addBadge(d.concept);
                 renderFeedback(true, "RÉPONSE VALIDÉE");
             } else {
                 lives--;
-                if(lives > 0) {
-                    renderFeedback(false, choice === "TEMPS ÉCOULÉ" ? "TEMPS ÉCOULÉ ! REESSAYEZ" : "MAUVAISE RÉPONSE ! REESSAYEZ");
-                } else {
-                    currentIdx = Math.max(0, currentIdx - 1); // Recul
-                    lives = 2;
-                    renderFeedback(false, "SÉCURITÉ ACTIVÉE : RECUL D'UNE SALLE");
-                }
+                if(lives > 0) renderFeedback(false, "ERREUR ! UNE CHANCE RESTANTE");
+                else { currentIdx = Math.max(0, currentIdx - 1); lives = 2; renderFeedback(false, "SÉCURITÉ : RECUL D'UNE SALLE"); }
             }
         }
 
@@ -211,29 +177,32 @@
         function addBadge(concept) {
             const grid = document.getElementById("inventory-grid");
             const id = `b-${concept.replace(/\s+/g, '')}`;
-            if(!document.getElementById(id)) {
-                grid.innerHTML += `<div id="${id}" class="bg-white border-2 border-[#d4a373] px-3 py-1 rounded text-[8px] font-bold uppercase">${concept}</div>`;
-            }
+            if(!document.getElementById(id)) grid.innerHTML += `<div id="${id}" class="bg-white border-2 border-[#d4a373] px-3 py-1 rounded text-[8px] font-bold uppercase">${concept}</div>`;
         }
 
         function renderEnd() {
+            document.getElementById("ui-header").classList.add("hidden");
             document.getElementById("game-box").innerHTML = `
-                <div class="text-center card-static">
-                    <div class="text-6xl mb-4">🏆</div>
-                    <h2 class="text-2xl font-black mb-2 uppercase">Labyrinthe Terminé</h2>
-                    <p class="text-stone-500 text-sm mb-6 font-bold uppercase italic">${studentName}</p>
-                    <p class="text-sm text-stone-400 mb-8">Vos résultats ont été transmis avec succès.</p>
-                    <button onclick="location.reload()" class="btn-action px-12 py-4 rounded-lg font-bold w-full">REFAIRE L'AXE 1</button>
+                <div class="card-static max-h-[500px] overflow-y-auto p-2">
+                    <div class="text-center">
+                        <div class="text-5xl mb-4">🏆</div>
+                        <h2 class="text-2xl font-black mb-6 uppercase">Rapport de Fin de Mission</h2>
+                    </div>
+                    <div class="space-y-4">
+                        ${database.map((d, i) => `
+                            <div class="correction-box shadow-sm">
+                                <p class="font-bold text-[#3e2723]">${i+1}. ${d.q}</p>
+                                <p class="text-green-700 font-bold mt-1">✓ Solution : ${d.correct}</p>
+                                <p class="text-stone-600 italic mt-2 text-[11px] leading-relaxed"><strong>Explication :</strong> ${d.exp}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button onclick="location.reload()" class="btn-action px-12 py-4 rounded-lg font-bold w-full mt-6">REFAIRE LE TEST</button>
                 </div>`;
         }
 
         function saveData(nom, question, reponse, correct) {
-            fetch(SHEET_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nom, question, reponse, correct })
-            });
+            fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type":"application/json" }, body: JSON.stringify({ nom, question, reponse, correct }) });
         }
     </script>
 </body>
